@@ -5,19 +5,17 @@ import { Redirect } from '@shopify/app-bridge/actions';
 const useSubscriptionUrl = (url) => {
   // let ab=[]
   const subscriptionArr = async(array) => {
-    console.log("array",array)
+// let newArray = array.slice(0,1);
+// console.log("gfgfgfgfgffgfg",newArray);
   
   let planName=""
     if(array.length==0){
     planName="Free"
     }
   
-    // console.log("valll",val)
      const ab = await array.find((val, i) => {
       if (val.status === "active"){
-        // console.log("fff",val)
         planName=val.name
-        // setData(val)
         return planName
       }
       else{
@@ -25,14 +23,11 @@ const useSubscriptionUrl = (url) => {
         return planName
       }
     })
-    // console.log("fgg",planName)
     return planName
 
   }
   const config = {
-    // The client ID provided for your application in the Partner Dashboard.
     apiKey: process.env.SHOPIFY_API_KEY,
-    // The host of the specific shop that's embedding your app. This value is provided by Shopify as a URL query parameter that's appended to your application URL when your app is loaded inside the Shopify admin.
     host: new URLSearchParams(location.search).get("host"),
     forceRedirect: true
 };

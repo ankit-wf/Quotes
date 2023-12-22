@@ -41,6 +41,7 @@ export default function HomePage() {
   const [status, setStatus] = useState("")
   let currentPage = searchParams.get('pagenumber')
   const [loading, setLoading] = useState(false)
+  const [loader, setLoader] = useState(true)
   const pagination = usePagination(currentPage, navigate)
   let listingPerPage = 5
   const [totalRecord, setTotalRecord] = useState(0);
@@ -190,7 +191,7 @@ export default function HomePage() {
     } catch (error) {
       console.error("Error:", error);
     }
-
+setLoader(false)
   }, [totalChart, currentPage, test, newPlan])
 
   let newData = [];
@@ -366,9 +367,14 @@ export default function HomePage() {
 
   return (
     <>
+    {loader ?
+        <div className='spinnerStyle'>
+          <Spinner accessibilityLabel="Small spinner example" size="large" />
+        </div>
+        :
       <Page fullWidth>
+        <span className="topHeading"><Text variant="heading2xl" as="h3" >Quotes</Text></span>
         <Grid>
-
           <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
             <LegacyCard sectioned >
               <div style={{ height: '150px' }}>
@@ -523,6 +529,8 @@ export default function HomePage() {
 
                     {status === "Free" && (
                       <>
+                      {remainData - rowMarkup.length > 0 &&
+                      
                         <div>
                           <LegacyCard sectioned>
                             <TextContainer>
@@ -539,10 +547,12 @@ export default function HomePage() {
                             <ProSubscription />
                           </div>
                         </div>
+                      }
+
                       </>
                     )}
 
-                    {status === "Basic" && remainData < 5 ?
+                    {status === "Basic" && remainData < 100 ?
                       <>
                         <PaginationControl
                           page={parseInt(pagination.currentPage)}
@@ -555,7 +565,7 @@ export default function HomePage() {
                       </>
                       : ""
                     }
-                    {status === "Basic" && remainData >= 5 ?
+                    {status === "Basic" && remainData >= 100 ?
                       <>
                         <LegacyCard sectioned>
                           <TextContainer>
@@ -595,6 +605,7 @@ export default function HomePage() {
           </Grid.Cell>
         </Grid>
       </Page >
+ }
     </>
   );
 }

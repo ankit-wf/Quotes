@@ -1,0 +1,48 @@
+{% comment %} <button
+onclick="BasketIcon(this)"
+target-all='{{ product | json }}'
+selectedVarraint='{{ product.selected_or_first_available_variant.id }}'
+id="basketIcon"
+>Basket
+</button>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script>
+console.log(" basket icon show") {% endcomment %}
+
+<div
+  id="basketIcon_Id"
+  shop-domain='{{ shop.domain }}'
+  shop-email='{{ shop.email }}'
+  customer-email='{{ customer.email }}'
+  currency-type='{{ shop.money_format }}'
+  target-all='{{ product | json }}'
+  selectedVarraint='{{ product.selected_variant.id }}'
+>
+</div>
+
+<script>
+console.log("product.selected_variant.id ",'{{ product.selected_variant.id }}')
+</script>
+
+<script src="https://kit.fontawesome.com/0fafcbd8a8.js"  defer></script>
+
+{% schema %}
+{
+  "name": "Basket Icon",
+  "target": "body",
+  "enabled_on": {
+    "templates": ["*"]
+  },
+  "stylesheet": "button.css",
+  "javascript": "basket-button.js",
+  "settings": [
+    {
+      "label": "Color",
+      "id": "color",
+      "type": "color",
+      "default": "#000000"
+    }
+  ]
+}
+{% endschema %}

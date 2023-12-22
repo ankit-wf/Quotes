@@ -12,7 +12,6 @@ const CancelSubscription = () => {
     const subscription = useSubscriptionUrl()
   const [activeSub, setActiveSub] = useState("")
   const [status, setStatus] = useState("")
-console.log("activeSub",activeSub)
   const ShopApi = useApi()
   const [test, setTest] = useState(false)
   const navigate = useNavigate();
@@ -20,14 +19,13 @@ console.log("activeSub",activeSub)
   let planName = ""
 
     useEffect(async()=>{
-        const activeSubId = await ShopApi.getSubscription()
+        const activeSubId = await ShopApi.getCurrentPlan()
         setActiveSub(activeSubId)   
-        
         try {
           const response = await fetch(`/api/subscription/planstatus`);
           const result = await response.json();
-          dataArr = result.data
-    
+          dataArr = result.data;
+          console.log("12121212", dataArr)
           planName = await subscription.subscriptionArr(result.data)
           if (planName === "") {
             setStatus("Free")
@@ -35,46 +33,55 @@ console.log("activeSub",activeSub)
           setStatus(planName)
         } catch (error) {
           console.error("Error:", error);
-        }
-   
-
+        }  
 
       },[test])
 
-    const cancelSubscription2 = async () => {
-        try {
-          const response = await fetch("/api/subscription/cancel", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ id: activeSub }),
-          });
-          const result = await response.json();
-          
-          if (result.data.body.data.appSubscriptionCancel.appSubscription.status === "CANCELLED") {
-            setTest(true)
-            navigate('/')
-          }
+    const cancel_Handler = async () => {
+      try {
+        // setSmallLoading(true)
+        const response = await fetch(`/api/subscription/cancel?id=${activeSub.id}`);
+        const result = await response.json();
+        if (result.msg === "Subscription Cancelled") {
+          // setSmallLoading(false)
+          navigate('/');
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+        // try {
+        //   const response = await fetch("/api/subscription/cancel", {
+        //     method: "POST",
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //     },
+        //     body: JSON.stringify({ id: activeSub }),
+        //   });
+        //   const result = await response.json();       
+        //   if (result.data.body.data.appSubscriptionCancel.appSubscription.status === "CANCELLED") {
+        //     setTest(true)
+        //     navigate('/')
+        //   }
     
-        } catch (error) {
-          console.error("Error:", error);
-        }   
+        // } catch (error) {
+        //   console.error("Error:", error);
+        // }   
     }
     const addSub = () =>{
-      navigate('/pricingplan')
+      navigate('/pricingplan') 
     }
   return (
     <>
     {status === "Free" ?  <div>
-        <p>Please Add Subscription Plan</p>
+    <p>You don't have any Plan please add Plan : <strong>{status}</strong></p>
         <Button onClick={addSub}>
      Add Subscription
    </Button>
    </div> :
     <div>
-        <p>If you want to Cancel Subscription</p>
-     <Button onClick={cancelSubscription2}>
+        <p>If you want to Cancel Subscription </p>
+        <p>Your Current Subscription Plan : <strong>{status}</strong></p>
+     <Button onClick={cancel_Handler}>
      Cancel
    </Button>
    </div>

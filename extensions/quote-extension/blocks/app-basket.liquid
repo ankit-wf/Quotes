@@ -1,0 +1,42 @@
+<button
+onclick="Basket(this)"
+target-all='{{ product | json }}'
+selectedVarraint='{{ product.selected_or_first_available_variant.id }}'
+id="basketQuote"
+>Add Basket
+</button>
+
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script>
+console.log("hello basket")
+
+
+</script>
+
+
+
+
+
+
+
+{% schema %}
+{
+  "name": "Basket Quote",
+  "target": "section",
+  "enabled_on": {
+    "templates": ["*"]
+  },
+  "stylesheet": "button.css",
+  "javascript": "button.js",
+  "settings": [
+    {
+      "label": "Color",
+      "id": "color",
+      "type": "color",
+      "default": "#000000"
+    }
+  ]
+}
+{% endschema %}

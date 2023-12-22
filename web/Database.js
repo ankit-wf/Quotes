@@ -1,6 +1,5 @@
 import mysql from 'mysql2'
 
-
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -11,8 +10,9 @@ db.connect(() => {
   try {
     console.log('Connected :)')
   } catch (err) {
-    console.log(err);
+    console.log("error aaaa gyaaaa eeee",err);
   }
 
 })
 export default db
+

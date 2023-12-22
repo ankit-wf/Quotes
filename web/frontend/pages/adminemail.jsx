@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import { TextField, Button, AlphaCard, Text, Grid, Page } from '@shopify/polaris';
+import { TextField, Button, AlphaCard, Text, Grid, Page, Frame } from '@shopify/polaris';
 import { useForm, Controller } from 'react-hook-form';
 import { useAuthenticatedFetch } from "../hooks/index";
 import * as errorConstant from '../Utils/ErrorMessage'
 import './css/myStyle.css'
 import { Dot } from 'react-bootstrap-icons';
 import useApi from '../hooks/useApi';
+import useToast from '../hooks/useToast';
+
 const AdminForm = () => {
     //let getToken = (window.localStorage.getItem("myToken") === null )? [] : JSON.parse(localStorage.getItem("myToken"))      
 
@@ -25,12 +27,17 @@ const AdminForm = () => {
     //   ab = window.localStorage.getItem("idToken") === null ? [] : JSON.parse(window.localStorage.getItem("idToken"));
     //   console.log("GetToken", ab)
 
+
+    const [msg, setMsg] = useState("");
+    const toast = useToast(msg);
+
+
     useEffect(async () => {  
 
         const metafieldId = await metafieldHook.metafield()
         const shop = await metafieldHook.shop()
  
-        console.log("hooookshop",shop.shopName)
+        console.log("hooookshop",metafieldId)
         setShopData(shop.shopName)
         setMetaId(metafieldId)
         try {
@@ -40,16 +47,17 @@ const AdminForm = () => {
             arr.find((f) => {
                 if (f.node.key === "admin-form-display") {
                     // console.log("ggggggg",f.node.value)
-                    let avv = JSON.parse(f.node.value)
-                 
+                    let avv = JSON.parse(f.node.value)                 
                     return reset1(avv)
                 }
+
                 if (f.node.key === "admin-form-token") {
                     let avv = JSON.parse(f.node.value)
                     // console.log("avvvvv",avv)
                     setTokenData(avv)
                 }
             })
+
         } catch (error) {
             console.error("Error:", error);
         }
@@ -64,6 +72,7 @@ const AdminForm = () => {
             type: "single_line_text_field",
             value: JSON.stringify(data)
         };
+
         try {
             const response = await fetch("/api/app-metafield/create", {
                 method: "POST",
@@ -74,9 +83,14 @@ const AdminForm = () => {
             });
             const result = await response.json();
 
-            if (result.status === "sucess") {
-                setData(result.msg)
-                setMessage(result.msg)
+            if (result.status === "success") {
+                // setData(result.msg)
+                // setMessage(result.msg)
+                toast.setActive(!toast.active)
+            toast.toggleActive
+            setMsg("Data Saved Sucessfully")
+
+
             }
 
         } catch (error) {
@@ -110,6 +124,10 @@ const AdminForm = () => {
             });
             reset2({ testemail: "" })
             const result = await response.json();
+            toast.setActive(!toast.active)
+            toast.toggleActive
+            setMsg("Data Saved Sucessfully")
+
         } catch (error) {
             console.error("Error:", error);
         }
@@ -118,6 +136,11 @@ const AdminForm = () => {
     return (
         <>
             <Page fullWidth>
+            <div className='frameToast'>
+                    <Frame style={{ minHeight: 0 }}>
+                        {toast.toastMarkup}
+                    </Frame>
+                </div>
                 <Grid>
                     <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                         <form onSubmit={handleSubmit1(onSubmit)} >

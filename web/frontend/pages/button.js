@@ -9,78 +9,23 @@ let ModalForm = document.getElementById('main-Modal-form')
 let EmailSuccess = document.getElementById('sucess-form-msg')
 let FetchData = []
 let F2 = [];
-let variant_size = [];
+let variant_size = []
 let variant_title = ""
 let variant_img = ""
 let getvariants = JSON.parse(localStorage.getItem("variants")) === null ? "" : JSON.parse(localStorage.getItem("variants"))
 let shopdetail = JSON.parse(localStorage.getItem("shop")) === null ? "" : JSON.parse(localStorage.getItem("shop"))
-let arrr = {};
-let adminMetaresult = [];
-let metfieldToken = [];
-let customerMetaresult = [];
+let arrr = {}
+let adminMetaresult = []
+let metfieldToken = []
+let customerMetaresult = []
 let fieldForms;
 let ab = ""
-let urlNew;
-let customFields = [];
-let setData;
-let metafiledLabel;
-let gridSettings;
-let subscription;
-let productData=[];
-
-// let basketIcon_Id = document.getElementById("basketIcon_Id");
-// basketIcon_Id.addEventListener("click", basketButtonHandle);
-// document.addEventListener("DOMContentLoaded", basketIconShow);
-
-
-// --------------- basket Icon click Handle ---------------
-// async function basketButtonHandle (){
-//     console.log("basketButtonHandle ")
-//     let gg = localStorage.getItem("productData");
-//     console.log("check data gg", gg)
-//     window.location = "/pages/basket-qoute";
-// }
-
-// --------------- create basket div icon ---------------
-//  function basketIconShow () {
-//     console.log("basketIconShow")
-//     let cartIcon = document.getElementById("cart-icon-bubble");
-//     const div = document.createElement('div');
-//     div.innerHTML = `<div class="basket-icon"><span></span></div>`;
-//     // div.addEventListener('click', basketButtonHandle);
-//     cartIcon.after(div);
-    
-// }
-// basketIconShow();
-
-// setTimeout(() => {
-    // basketIconShow();
-// }, [3000])
-
-// console.log("locallllll", localStorage.getItem("productData"))
-
-
-
-// --------------- create default div inside basket ---------------
-// async function basketDivFunction() {
-   
-//     console.log("basketDivFunction")
-//     let arrayList= JSON.parse(localStorage.getItem("productData"));
-//     document.querySelector('.shared-page-heading').innerHTML = "Basket Quotes";
-//     let wishlistBody = '';
-//     arrayList.map((data, index) => {
-//         wishlistBody += `<div>
-//                             <a href="/products/"><img src="${data.product_image}" alt="not a text"  height="auto" width="100%" /></a>
-//                             <h3 class="title11"> <b>Title: </b> ${data.product_name}</h3>
-//                             <h4 class="price11"> <b>Price: </b>${data.product_price}/-</h4> 
-                           
-//                          </div>`;
-//     });
-//     wishlistBody += '</div>';
-//     document.querySelector('.show-shared-wishlist').innerHTML = wishlistBody;
-// };
-
-
+let urlNew
+let customFields = []
+let setData
+let metafiledLabel
+let gridSettings
+let subscription
 async function GetQuotes(FinalData) {
     FetchData = JSON.parse(FinalData.getAttribute("target-all"));
     urlNew = new URL(location.href).searchParams.get("variant");
@@ -124,71 +69,7 @@ async function GetQuotes(FinalData) {
         title: FetchData.title,
     }
     Modal()
-};
-
-
-
-
-// --------------- Add to basket Handle ---------------
-async function Basket (basketData){  
-    urlNew = new URL(location.href).searchParams.get("variant");
-    let productData = [];
-    let variant_size = [];
-    const resultObject = [];
-    let arrr = {};
-    productData = JSON.parse(basketData.getAttribute("target-all"));
-    // urlNew = JSON.parse(basketData.getAttribute("selectedVarraint"));
-    let quantityInput = document.querySelector('input[name="quantity"]');
-    var quantityValue = quantityInput.value;
-
-    if ([productData]) {
-    [productData].map((val) => {
-        val.variants.map((data) => {
-            if (data.id === parseInt(urlNew)) {                
-                variant_size = data.options;
-            }
-            else if (urlNew == null) {              
-                    variant_size = data.options                
-            }
-        })
-      
-    })
 }
-
-    productData.options.map((data, index) => {
-        variant_size.map((val, i) => {
-            if (i === index) {
-                if (data != "title" && val != "Default Title") {
-               resultObject.push({
-                title:data,
-                value:val
-               })
-            }
-        }
-    })
-})
-for (let i = 0; i < productData.options.length; i++) {
-    arrr[productData.options[i]] = variant_size[i];
-}
-// localStorage.setItem("variants", JSON.stringify(arrr))
-let storedData = localStorage.getItem("productData");
-let saveData = JSON.parse(storedData) || [];
-
-let dataArray=[...saveData, {
-    product_name: productData.title,
-    product_image: productData.images,
-    product_price: (productData.price/100).toFixed(2),
-    product_id: productData.id,
-    product_variant: arrr,
-    product_quantity: quantityValue
-}];
-
-console.log("HHHHH ", dataArray)
-
-localStorage.setItem("productData", JSON.stringify(dataArray));
-
-};
-
 
 
 document.addEventListener('keyup', function (e) {
@@ -298,6 +179,8 @@ async function Modal() {
 
         customData = customData.replaceAll('<button ', '<button onclick="submitHandler()" ')
         // customData = customData.setAttribute('onfocus', 'removeError()')
+
+
 
         const parser = new DOMParser();
         const html = parser.parseFromString(customData, 'text/html');
@@ -656,6 +539,62 @@ async function Modal() {
                 input.style.left = '4%'
             });
 
+            // // Upper_Label
+            // const inputElements2 = html.querySelectorAll('.rendered-form input, .rendered-form textarea');
+            // inputElements2.forEach(input => {
+            //     const labelForAttribute = input.parentElement.querySelector('label').textContent.trim();
+            //     const formattedId = labelForAttribute.toLowerCase().replace(/\s+/g, '');
+            //     input.name = formattedId;
+            //     input.id = formattedId;
+            // });
+
+            // // Two_Grid
+            // const labels = html.querySelectorAll('.formbuilder-text-label,.formbuilder-textarea-label');
+            // labels.forEach(label => {
+            //     label.style.display = 'block';
+            //     label.style.marginBottom = '2px';
+            // });
+
+            // const dataVar = html.querySelectorAll('.rendered-form');
+            // dataVar.forEach(i => {
+            //     i.style.position = "relative";
+            //     i.style.display = 'grid';
+            //     i.style.gridTemplateColumns = 'auto auto';
+            //     i.style.gridColumnsGap = '50px'
+            // })
+
+            // const gridRender2 = html.querySelectorAll('.form-group');
+            // gridRender2.forEach(e => {
+            //     e.style.display = "flex";
+            //     e.style.justifyContent = "space-between";
+            //     e.style.alignItems = "center";
+            // });
+            // const gridRender = html.querySelectorAll('.formbuilder-text, .formbuilder-textarea');
+            // gridRender.forEach(e => {
+            //     e.style.float = "left";
+            //     e.style.width = "48%";
+            //     e.style.justifyContent = "space-around";
+            //     e.style.alignSelf = "center";
+            //     e.style.marginTop = "10px";
+            // });
+
+            // const inputElements = html.querySelectorAll('.rendered-form input,.rendered-form textarea');
+            // inputElements.forEach(input => {
+            //     input.style.width = "70%";
+            //     input.style.height = "30px"
+            // });
+
+            // const radioGroupInput = html.querySelectorAll('.rendered-form .radio-group .formbuilder-radio input, .rendered-form .checkbox-group .formbuilder-checkbox input');
+            // radioGroupInput.forEach(input => {
+            //     input.style.width = "15%";
+            // });
+
+            // const btnDiv = html.querySelectorAll('.formbuilder-button.form-group.field-button');
+            // btnDiv.forEach(input => {
+            //     input.style.marginTop = "5%";
+            //     input.style.position = "absolute";
+            //     input.style.bottom = '-24%'
+            // });
             bodyy = html.body.innerHTML
         }
 
@@ -693,24 +632,27 @@ async function Modal() {
         let combineArr;
         let getValue = [];
         const inputElements = document.querySelectorAll('.rendered-form input,.rendered-form textarea ');
-      
+        console.log("ttttttttttttt",inputElements)
         for (let i = 0; i < inputElements.length; i++) {
             const inputElement = inputElements[i];
             idValue = inputElement.getAttribute('id');
             const nameValue = inputElement.getAttribute('name');
             ValueArr = document.getElementById(idValue).value;
+            console.log("vvvvvv",ValueArr)
             idVar.push(
                 {
                     key: nameValue,
                     value: ValueArr
                 }
             );
+            console.log("idVara", idVar)
             let tokens = [
                 { key: "shopName", value: shopdetail[0].shop_name },
                 { key: "shopDomain", value: shopdetail[0].shop_domain },
                 // { key: "shopLogo" }
             ];
             combineArr = tokens.concat(idVar);
+            console.log("ccccc",combineArr)
             let abc = subscription.replace(/"/g, "");
 
             if (abc === "Premium") {
@@ -751,7 +693,6 @@ async function Modal() {
             )
         });
         function replaceTokens(str) {
-
             for (let i = 0; i < combineArr.length; i++) {
                 for (let k = 0; k < metfieldToken.length; k++) {
                     if (combineArr[i].key === metfieldToken[k].token) {
@@ -760,32 +701,41 @@ async function Modal() {
                                 [combineArr[i].key]: combineArr[i].value
                             }
                         )
-                        
                         str = str.replace("## " + metfieldToken[k].token + " ##", combineArr[i].value);
                         str = str.replace("## shopDomain ##", shopdetail[0].shop_domain)
                         str = str.replace("## shopName ##", shopdetail[0].shop_name)
                         // console.log("strrrr", str.replace("## " + metfieldToken[k].token + " ##", combineArr[i].value))
                     }
                 }
-                console.log("getValue",getValue)
             }
             //     str = str.replace("## customer_email ##", email);
             //     str = str.replace("## shop ##", shopdetail[0].shop_name);
             return str;
         }
 
-       
         let subject = replaceTokens(adminMetaresult.subject)
+
         getData = {
             shop_email: adminMetaresult.adminEmail,
             shop_name: shopdetail[0].shop_name,
             subject: subject,
             admin_email: shopdetail[0].shop_email
         }
+console.log("labelValues2",labelValues2)
         var inputs = document.querySelectorAll('.rendered-form input');
         var All_labels = document.querySelectorAll(".formbuilder-text-label");
-        let EmptyCheck = false;     
 
+        let EmptyCheck = false;
+        // for (let i = 0; i < inputs.length; i++) {      
+        //     if (inputs[i].value === "") {
+        //         EmptyCheck = true
+        //         inputs[i].style.border = "2px solid red";
+        //         console.log("if", All_labels[i].innerHTML + " *")
+        //     } else {
+        //         inputs[i].style.border = "";
+        //         console.log("else",All_labels[i].innerHTML.replace(" *", ""))
+        //     }
+        // }      
         for (let i = 0; i < inputs.length; i++) {
             if (inputs[i].value === "") {
                 if (!All_labels[i].innerHTML.includes("*")) {
@@ -793,11 +743,9 @@ async function Modal() {
                 }
                 inputs[i].style.border = "2px solid red";
                 EmptyCheck = true;
-            }
-             else {
-                console.log("empty else")
-                // inputs[i].style.border = "";
-                // All_labels[i].innerHTML = All_labels[i].innerHTML.replace(" *", "");
+            } else {
+                inputs[i].style.border = "";
+                All_labels[i].innerHTML = All_labels[i].innerHTML.replace(" *", "");
             }
         }
 
@@ -807,10 +755,32 @@ async function Modal() {
             console.log("Form submitted successfully!");
         }
 
+
+        // inputs.map((p, i) => {
+        //     // var email_val = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;              
+        //     if (p.value === "") {
+        //         EmptyCheck = true;
+        //         // document.getElementById("errorDiv" + i + "").innerHTML = "*This field is required";
+
+        //         // document.getElementById("errorDiv" + i + "").style.color = "Red";
+        //     }
+
+        //     else {
+        //         var inputs = document.querySelectorAll('.rendered-form input');
+        //         inputs.forEach(function (input) {
+        //             input.style.border = "";
+        //         });
+        //         // document.getElementById("errorDiv" + i + "").innerHTML = "";
+        //         // document.getElementById("errorDiv" + i + "").style.color = "";
+        //     }
+        // })
+
         if (EmptyCheck === true) {
 
         }
         else {
+
+
             for (let i = 0; i < getValue.length; i++) {
                 const obj = getValue[i];
                 if (obj.hasOwnProperty('fileupload')) {
@@ -822,10 +792,9 @@ async function Modal() {
             var quantityValue = quantityInput.value;
             var formattedPrice = (FetchData.price / 100).toFixed(2)
             var totalAmount = formattedPrice*quantityValue;
-            let detailArr_data = [{id: FetchData.id, image: variant_img, title: FetchData.title, variants: JSON.stringify(arrr), variantId: variantId, quantity: quantityValue, price: formattedPrice },
-                {id: 2, image: 'https://mukesh-kumar004.myshopify.com/cdn/shop/products/bedroom-bed-with-brown-throw-pillows_925x_76c8c3a0-831b-47ac-a33a-5efdeb6cdee7.jpg?v=1685594875', title: "FetchData.title", variants: JSON.stringify(arrr), variantId: 155155511, quantity: "50", price: "10"}]
+            let detailArr_data = [{ variants: JSON.stringify(arrr), variantId: variantId, quantity: quantityValue, price: formattedPrice,totalAmount:totalAmount }]
            
-            console.log("check all data",detailArr_data)
+            console.log("check all data",getValue)
 
             try {
                 const response = await fetch(`${BACKEND_PORT}/quote/createquote`, {
@@ -834,7 +803,7 @@ async function Modal() {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                       userArr: JSON.stringify(getValue), shop: getData, detailArr_data:detailArr_data
+                        productArr: data, userArr: JSON.stringify(getValue), shop: getData, detailArr_data:detailArr_data
                         // productArr: data, userArr: userInfo, variants: arrr, shop: getData, date: todayDate
                     }),
                 })

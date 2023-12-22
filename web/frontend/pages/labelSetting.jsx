@@ -1,8 +1,9 @@
-import { Checkbox, Button,Toast, Frame, } from '@shopify/polaris';
+import { Checkbox, Button, Frame, } from '@shopify/polaris';
 import { useForm, Controller } from "react-hook-form";
 import "./css/myStyle.css"
 import { useAuthenticatedFetch } from '../hooks'
 import useApi from '../hooks/useApi';
+import useToast from '../hooks/useToast';
 import { useEffect, useState,useCallback } from 'react';
 
 const LabelSetting = () => {
@@ -11,12 +12,10 @@ const LabelSetting = () => {
   const [id, setId] = useState("")
 
   const { handleSubmit, control, reset, register } = useForm({});
+  const [msg, setMsg] = useState("");
+  const toast = useToast(msg);
 
-  const [active, setActive] = useState(false);
-  const toggleActive = useCallback(() => setActive((active) => !active), []);
-  const toastMarkup = active ? (
-    <Toast content="Save Settings" onDismiss={toggleActive} />
-  ) : null;
+
 
   useEffect(async () => {
 
@@ -74,8 +73,10 @@ const LabelSetting = () => {
         body: JSON.stringify(customerData),
       });
       const result = await response.json();
-      if (result.status === "sucess") {
-        setData(result.msg)
+      if (result.status === "success") {
+        toast.setActive(!toast.active)
+        toast.toggleActive
+        setMsg("Data Saved Sucessfully")
       }
 
     } catch (error) {
@@ -99,8 +100,10 @@ const LabelSetting = () => {
         body: JSON.stringify(labelGrid),
       });
       const result = await response.json();
-      if (result.status === "sucess") {
-        setData(result.msg)
+      if (result.status === "success") {
+        toast.setActive(!toast.active)
+        toast.toggleActive
+        setMsg("Data Saved Sucessfully")
       }
 
     } catch (error) {
@@ -111,7 +114,41 @@ const LabelSetting = () => {
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)}>
+    <div className='frameToast'>
+                    <Frame style={{ minHeight: 0 }}>
+                        {toast.toastMarkup}
+                    </Frame>
+                </div>
+    <form onSubmit={handleSubmit(onSubmit)}>
+        <div className='selectDiv'>
+          <div className='selectInnerDiv'>
+            <label>Label Position</label>
+            <select {...register("label")} className='selectOption'>
+              <option value="">Select</option>
+              <option value="left_label">left_label</option>
+              <option value="Placholder">Placholder</option>
+              <option value="Upper_Label">Upper_Label</option>
+            </select>
+          </div>
+
+          <div className='selectInnerDiv'>
+            <label>Select Column</label>
+            <select {...register("grid")} className='selectOption'>
+              <option value="">Select</option>
+              <option value="Single_Grid">One Column</option>
+              <option value="Two_Grid">Two Column</option>
+            </select>
+          </div>
+
+          <span className='submitButton'>
+            <input type="submit" />
+          </span>
+        </div>
+      </form>
+
+
+      
+      {/* <form onSubmit={handleSubmit(onSubmit)}>
         
         <select {...register("label")}>
           <option value="" >
@@ -135,7 +172,7 @@ const LabelSetting = () => {
           {toastMarkup}
       </Frame>
    
-      </form>
+      </form> */}
 
     </>
   );
