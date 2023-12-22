@@ -234,3 +234,11 @@ form#submitButton {
   align-items: center; */
 }
 
+
+.hideAddToCart {
+  display: none;
+}
+
+.showAddToCart {
+  display: block;
+}

@@ -24,10 +24,7 @@ const [loading,setLoading] = useState(false)
       
         const lastPost = currentPage * listingPerPage ;
         const firstPost = lastPost - listingPerPage;
-
         const totalPages = Math.ceil(totalRecord / listingPerPage);
-     
-// console.log("currentPage", currentPage)
         return { lastPost, firstPost, totalPages }        
     }
 
@@ -43,4 +40,4 @@ const [loading,setLoading] = useState(false)
     };
 };
 
-export default usePagination
+export default usePagination;

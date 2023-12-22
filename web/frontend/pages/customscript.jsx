@@ -1,8 +1,12 @@
-import React from 'react'
+import React from 'react';
+import { Text } from '@shopify/polaris';
 
 const CustomScript = () => {
   return (
-    <div>CustomScript</div>
+    <>
+      <Text variant="heading2xl" as="h3">Custom script</Text>
+      <div>CustomScript</div>
+    </>
   )
 }
 

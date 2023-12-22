@@ -1,10 +1,20 @@
-import React, { useState } from 'react'
-import { useAuthenticatedFetch } from './useAuthenticatedFetch'
+import { useAuthenticatedFetch } from './useAuthenticatedFetch';
+import useSubscriptionUrl from './useSubscriptionUrl';
+import Swal from 'sweetalert2';
+
 
 const useApi = () => {
-    const [metafieldId, setMetafieldId] = useState("")
-    const fetch = useAuthenticatedFetch()
-    const [subscrId, setSubscrId] = useState([])
+    const fetch = useAuthenticatedFetch();
+    const subscription = useSubscriptionUrl();
+
+    const swtAlt = (data) => {
+        Swal.fire({
+            icon: "success",
+            title: data.title,
+            text: data.text
+        });
+    }
+
 
     const shop = async () => {
         try {
@@ -34,30 +44,147 @@ const useApi = () => {
             console.error("Error:", error);
         }
     }
-    const getSubscription = async () => {
-        let arr
-        let Newarr=""
+
+    const getCurrentPlan = async () => {
+        let planIdArray = [];
         try {
-            const response = await fetch(`/api/subscription/get-all`);
+            const response = await fetch(`/api/getPlanId`);
             const result = await response.json();
-            arr = result.data.body.data.currentAppInstallation.allSubscriptions.edges
+            planIdArray = result.data
+        } catch (err) {
+            console.log("err")
+        }
+
+        try {
+            const response = await fetch(`/api/subscription/planstatus`);
+            const result = await response.json();
+            let newArr = result.data;
+            const plan = await subscription.subscriptionArr(result.data);
+            const currentPlan = plan === "" ? "Free" : plan;
+            let planId = null;
+            await planIdArray.filter((item, index) => {
+                if (item.plan_name === currentPlan) {
+                    planId = item.plan_id
+                }
+            })
+            let newArrId = "";
+            await newArr.find((value) => {
+                if (value.status.toLowerCase() === "active") {
+                    newArrId = value.id
+                }
+            })
+            let id = newArrId;
+            return { id: id, currentPlan: currentPlan, planId: planId }
         } catch (error) {
             console.error("Error:", error);
         }
-        const data = await arr.find((value) => {
-            if (value.node.status === "ACTIVE") {
-                Newarr=value.node.id
-            }
-        })
-        let id= Newarr
-        return  id
+    };
+
+    const createAppMetafield = async (data, msg) => {
+        try {
+            const response = await fetch("/api/app-metafield/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            });
+            const result = await response.json();
+            msg.smallSpinner && msg.smallSpinner(false)
+            msg.isSwtAlt ? swtAlt(msg) : "";
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    };
+
+
+    const getAllAppMetafields = async () => {
+        try {
+            const response = await fetch(`/api/app-metafield/get-all?limit=${10}`);
+            const result = await response.json();
+            let allData = result.data.body.data.app.installation.metafields.edges;
+            return allData;
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    };
+
+    const commonForm = () => {
+        let defaultForm = [
+            {
+              className: "form-control",
+              label: "Name",
+              subtype: "text",
+              placeholder: "",
+              name: "name",
+              type: "text",
+            },
+            {
+              className: "form-control",
+              label: "Email",
+              subtype: "email",
+              placeholder: "",
+              name: "email",
+              type: "text",
+            },
+            {
+              type: "text",
+              subtype: "tel",
+              label: "Mobile",
+              className: "form-control",
+              name: "text",
+              access: false
+            },
+            {
+              type: "textarea",
+              required: false,
+              label: "Message",
+              placeholder: "",
+              className: "form-control",
+              name: "textarea",
+              access: false,
+              subtype: "textarea",
+            },
+            {
+              type: "button",
+              subtype: "submit",
+              label: "Submit",
+              className: "btn-primary btn",
+              name: "button",
+              access: false,
+              style: "primary",
+            },
+          ]
+
+        // let defaultForm = [{ "type": "text", "label": "Name", "className": "form-control", "name": "name", "access": false, "subtype": "text" }, { "type": "text", "subtype": "email", "label": "Email", "className": "form-control", "name": "email", "access": false }, { "type": "text", "subtype": "tel", "label": "Phone", "className": "form-control", "name": "text", "access": false }, { "type": "textarea", "label": "Message", "className": "form-control", "name": "textarea", "access": false, "subtype": "textarea" }, { "type": "button", "subtype": "submit", "label": "Submit", "className": "btn-primary btn", "name": "button", "access": false, "style": "primary" }]
+
+        let htmlForm = `<div class="rendered-form"><div class="formbuilder-text form-group field-name"><label for="name" class="formbuilder-text-label">Name</label><input type="text" class="form-control" name="name" id="name"></div><div class="formbuilder-text form-group field-email"><label for="email" class="formbuilder-text-label">Email</label><input type="email" class="form-control" name="email" id="email"></div><div class="formbuilder-text form-group field-text"><label for="phone" class="formbuilder-text-label">Phone</label><input type="tel" class="form-control" name="phone" id="phone"></div><div class="formbuilder-textarea form-group field-textarea"><label for="message" class="formbuilder-textarea-label">Message</label><textarea class="form-control" name="message" id="message"></textarea></div><div class="formbuilder-button form-group field-button"><button type="submit" class="btn-primary btn" name="button" style="primary" id="button">Submit</button></div></div>`
+
+        let defaultTokens = [
+            { token: " shopName " },
+            { token: " shopDomain " },
+            { token: "name" },
+            { token: "email" },
+            { token: "message" },
+            { token: "mobile" }
+        ];
+
+        return { htmlForm: htmlForm, defaultForm: defaultForm, defaultTokens: defaultTokens }
     }
 
     return {
         shop: shop,
         metafield: metafield,
-        getSubscription: getSubscription
+
+        swtAlt: swtAlt,
+        getCurrentPlan: getCurrentPlan,
+        createAppMetafield: createAppMetafield,
+        getAllAppMetafields: getAllAppMetafields,
+        commonForm: commonForm
     }
 }
 
-export default useApi
+export default useApi;
+
+
+
+
+

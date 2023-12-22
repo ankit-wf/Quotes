@@ -1,4 +1,6 @@
 import { DeliveryMethod } from "@shopify/shopify-api";
+import { orderStatusFunc } from "./index.js";
+
 
 export default {
   /**
@@ -80,4 +82,24 @@ export default {
       // }
     },
   },
+
+  FULFILLMENTS_CREATE: {
+    deliveryMethod: DeliveryMethod.Http,
+    callbackUrl: "/api/webhooks",
+    callback: async (topic, shop, body, webhookId) => {
+      const payload = JSON.parse(body);
+      orderStatusFunc(payload)
+    },
+  },
+
+  DRAFT_ORDERS_UPDATE: {
+    deliveryMethod: DeliveryMethod.Http,
+    callbackUrl: "/api/webhooks",
+    callback: async (topic, shop, body, webhookId) => {
+      const payload = JSON.parse(body);
+      orderStatusFunc(payload)
+    },
+  }
 };
+
+
