@@ -11,42 +11,130 @@
   metafiledNew1='{{app.metafields.quotes-app.customer-form-display.value}}'>Add to Quote
 </button>
 
-
-
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script>
+  let productAllData = JSON.parse('{{product | json }}')
   const shopDomain = '{{shop.domain}}'
   let position = shopDomain.search(".myshopify.com")
   const shopName = shopDomain.substring(0, position)
-
   let arr = []
   arr.push({shop_name: shopName, shop_domain: shopDomain, shop_email:'{{shop.email}}'})
 
 
   localStorage.setItem("shop", JSON.stringify(arr))
-  const d = '{{app.metafields.quotes-app.priceCSS.value}}'
-  if (JSON.parse(d).Price === true) {
-    const nodeList = document.querySelectorAll(".price.price--large.price--on-sale.price--show-badge,.card-information");
-    for (let i = 0; i < nodeList.length; i++) {
-      nodeList[i].style.display = "none";
+  const hideData = '{{app.metafields.quotes-app.priceCSS.value}}'
+  const customer_email = '{{ customer.email }}'
+  
+  const priceField = document.querySelectorAll(".price.price--large.price--on-sale.price--show-badge, .card-information");
+  const allPriceFields = document.querySelectorAll('.card-information')
+  let cartButton = document.querySelector('.product-form__buttons')
+ 
+
+  const hidePriceForEveryone = () => {
+    for(let i = 0; i < priceField.length; i++){
+      priceField[i].classList.remove("showAddToCart");
+      priceField[i].classList.add("hideAddToCart");
     }
+  };
+
+  const hidePriceForGuestUsers = () => {
+    for(let i = 0; i < priceField.length; i++){
+      priceField[i].classList.remove("hideAddToCart");
+      priceField[i].classList.add("showAddToCart");
+    }
+    
+  };
+
+  if (JSON.parse(hideData).hidePrice === 'Hide price for everyone') {
+    hidePriceForEveryone();
+  } else if (JSON.parse(hideData).hidePrice === 'Hide price for guest users') {
+    customer_email ? hidePriceForGuestUsers() : hidePriceForEveryone();
+  } else {
+    hidePriceForGuestUsers();
   }
 
-  if (JSON.parse(d).Price === false) {
-    const nodeList = document.querySelectorAll(".price.price--large.price--on-sale.price--show-badge,.card-information");
-    for (let i = 0; i < nodeList.length; i++) {
-      nodeList[i].style.display = "show";
-    }
+
+  if(cartButton){
+    let addButton = cartButton.querySelector('button[name="add"]');
+    let addButtonId = addButton ? addButton.id : null;
+    const addToCartButton = document.querySelector(`button#${addButtonId}`);
+    const hideAddToCartClass = JSON.parse(hideData).AddToCart ? "hideAddToCart" : "showAddToCart";
+    addToCartButton.classList.remove("showAddToCart", "hideAddToCart");
+    addToCartButton.classList.add(hideAddToCartClass);
   }
-  if (JSON.parse(d).AddToCart === true) {
-    let list = document.querySelector('button#ProductSubmitButton-template--19232627425579__main ').classList;
-    list.add("hide");
+  
+
+  let quoteButton = document.querySelector('.page-width.scroll-trigger.animate--slide-in .shopify-block.shopify-app-block button')
+  if(quoteButton){
+    quoteButton.style.visibility = "hidden"
   }
-  if (JSON.parse(d).AddToCart === false) {
-    let list = document.querySelector('button#ProductSubmitButton-template--19232627425579__main ').classList;
-    list.add("show");
-  }
+</script>
+
+<script>
+
+  // let convData = {isView: 1, isClick: 0};
+
+  // console.log("gggggggggg", productAllData)
+
+  // conversionFunc(BACKEND_PORT, productAllData, shopdetail, productResult, convData)
+
+  // async function conversionFunc(BACKEND_PORT, productAllData, shopdetail, productResult, convData){
+  //   if (productAllData !== null) {
+  //   try {
+  //     const productData = await fetch(`${BACKEND_PORT}/prod/productstats?productId=${productAllData.id}`
+  //     )
+  //     productResult = await productData.json();
+
+  //   } catch (error) {
+  //     console.error(`Download error: ${error}`);
+  //   }
+  //   console.log("aaaaaaaaaaaa", productAllData)
+  //   console.log("fffffffff", productResult)
+  //   if (productResult.count[0].count === 0) {
+
+  //     try {
+  //       const productData = await fetch(`${BACKEND_PORT}/qoutes/insertproduct`, {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           productId: productAllData.id,
+  //           productName: productAllData.title,
+  //           shopName: shopdetail[0].shop_name,
+  //           convData: convData
+  //         })
+  //       })
+
+  //       productResult = await productData.json();
+  //     } catch (error) {
+  //       console.error(`Download error: ${error}`);
+  //     }
+  //   }
+  //   else {
+  //     try {
+  //       const productData = await fetch(`${BACKEND_PORT}/quotes/updateproduct`, {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           productId: productResult.result[0].product_stats_id,
+  //           view: productResult.result[0].views + convData.isView,
+  //           click: productResult.result[0].clicks + convData.isClick,
+  //           shopName: shopdetail[0].shop_name,
+  //           modalview: "modalview"
+  //         })
+  //       })
+  //       productResult = await productData.json();
+  //     } catch (error) {
+  //       console.error(`Download error: ${error}`);
+  //     }
+  //   }
+  // }
+  // }
+  
 </script>
 
 <div id="myModal" class="modal">
@@ -67,7 +155,7 @@
         src="{{ 'img.jpg' | asset_url }} "
         width="150"
         height="150"
-        id="thankimg">
+        id="thankimg" />
       <p>
         Thank you for submitting a request a quote!
       </p>

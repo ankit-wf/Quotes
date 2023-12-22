@@ -17,6 +17,7 @@
     "@shopify/cli": "3.45.3",
     "dotenv": "^16.0.3",
     "formBuilder": "^3.8.3",
+    "graphql": "^16.8.1",
     "jquery": "^3.7.0",
     "jquery-ui-sortable": "^1.0.0",
     "node-localstorage": "^2.2.1",

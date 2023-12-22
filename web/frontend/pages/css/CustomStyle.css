@@ -1,0 +1,1004 @@
+.main-div {
+    background-color: black;
+    height: 45px;
+    width: 100%;
+    box-shadow: 0px 0px 10px gray;
+    border-bottom: 1px solid gray;
+    line-height: 40px;
+    color: white;
+    font-size: 20px;
+    font-weight: 900;
+    font-family: 'Trebuchet MS';
+    padding-left: 20px;
+    position: fixed;
+    z-index: 99;
+}
+
+.main-div a {
+    text-decoration: none;
+    list-style: none;
+    color: white;
+    margin-left: 60%;
+
+}
+
+.main-div a:hover {
+    color: gray;
+}
+
+.active {
+    font-weight: 700;
+}
+
+.items {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.items div {
+    width: 30%;
+    flex-grow: 1;
+    text-align: center;
+    padding: 20px 10px;
+    margin: 10px 1%;
+    box-shadow: 0px 0px 10px gray;
+}
+
+.items h2 {
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.items h3 {
+    font-size: 15px;
+    font-weight: 300;
+}
+
+.sidebar {
+    background-color: black;
+    width: 150px;
+    height: 90vh;
+    margin: 0px;
+    padding: 0px;
+    position: fixed;
+    line-height: 60px;
+}
+
+.sidebar a {
+    text-decoration: none;
+    list-style: none;
+    color: white;
+    margin: 0px 15px;
+}
+
+.sidebar a:hover {
+    color: gray;
+}
+
+.underHeader .Polaris-Button {
+    float: right;
+}
+
+.optionBox {
+    column-count: 2;
+    column-gap: 10px;
+}
+
+.optionBox div {
+    margin-bottom: 15px;
+}
+
+.inside-button-div {
+    display: -webkit-inline-box;
+    width: 100%;
+}
+
+.inside-button-div-fill-heart {
+    width: 15px;
+    height: 15px;
+    background-image: url("../assets/heart.svg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-color: transparent;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    margin-top: 9px;
+}
+
+.imgHeart {
+    margin-top: 12px;
+    margin-left: 10px;
+    margin-right: 5px;
+    filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8);
+
+}
+
+
+.button {
+    border: none;
+    cursor: pointer;
+    line-height: 40px;
+    height: 40px;
+    text-align: center;
+    width: 100%;
+}
+
+.Polaris-LegacyStack {
+    justify-content: space-between;
+
+}
+
+.Polaris-LegacyStack__Item label {
+    display: flex;
+    align-items: center;
+    grid-gap: 10px;
+}
+
+.Polaris-LegacyStack__Item label span {
+    display: flex;
+    grid-gap: 10px;
+}
+
+.Polaris-LegacyStack__Item span.Polaris-Choice__Control {
+    margin: 0;
+}
+
+.Polaris-LegacyStack__Item button.button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    grid-gap: 10px;
+}
+
+.Polaris-LegacyStack__Item button.button span {
+    display: flex;
+    align-items: center;
+}
+
+.color-boxx {
+    background-color: rgb(206, 204, 204);
+    position: absolute;
+    top: 360px;
+    left: 230px;
+    z-index: 30;
+    padding: 10px;
+
+}
+
+.color-boxx span {
+    float: right;
+    margin-top: -10px;
+    margin-left: 5px;
+    background-color: black;
+    color: white;
+    padding: 3px 5px;
+    cursor: pointer;
+}
+
+.save-button {
+    background-color: black;
+    color: white;
+    height: 40px;
+    line-height: 40px;
+    border: none;
+    position: absolute;
+    right: 58px;
+    top: 30px;
+    border-radius: 7px;
+    font-weight: 900;
+    cursor: pointer;
+    padding: 0px 20px;
+}
+
+.input-field-css {
+    height: 30px;
+    width: 60%;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid rgb(161, 160, 160);
+    border-radius: 5px;
+}
+
+.input-field-css:focus {
+    outline: none !important;
+    border: 1px solid rgb(161, 160, 160);
+    box-shadow: 0 0 5px #424242;
+}
+
+.Polaris-Page {
+    padding: 0px;
+}
+
+
+/* / / -----------------june 1 css for the about page----------------- / / */
+
+.header-save {
+    background-color: #424242;
+    height: 50px;
+    width: 100%;
+    line-height: 50px;
+    position: fixed;
+    z-index: 99;
+}
+
+.header-save button {
+    background-color: black;
+    color: white;
+    padding: 8px 20px;
+    border: none;
+    font-weight: 800;
+    border-radius: 5px;
+    margin-left: 92%;
+    cursor: pointer;
+}
+
+.text-button-main {
+    display: inline-flex;
+    background-color: gray;
+    color: black;
+    text-align: center;
+    height: 40px;
+    width: 180px;
+    padding-left: 25px;
+    align-items: center;
+    margin-left: 15px;
+    cursor: pointer;
+    animation-name: shaker;
+    animation-duration: 0.2s;
+    transform-origin: 50% 50%;
+    animation-timing-function: linear;
+}
+
+.text-button-main-up {
+    display: inline-flex;
+    background-color: gray;
+    color: black;
+    text-align: center;
+    height: 40px;
+    width: 180px;
+    padding-left: 25px;
+    align-items: center;
+    margin-left: 15px;
+    cursor: pointer;
+    animation-name: shakerVerticle;
+    animation-duration: 0.2s;
+    transform-origin: 50% 50%;
+    animation-timing-function: linear;
+}
+
+.text-button-main-ripple {
+    display: inline-flex;
+    background-color: gray;
+    color: black;
+    text-align: center;
+    height: 40px;
+    width: 180px;
+    padding-left: 25px;
+    align-items: center;
+    margin-left: 15px;
+    cursor: pointer;
+    animation-name: spinner;
+    animation-duration: 500ms;
+    animation-timing-function: linear;
+}
+
+.text-button-main-fade_in {
+    display: inline-flex;
+    background-color: gray;
+    color: black;
+    text-align: center;
+    height: 40px;
+    width: 180px;
+    padding-left: 25px;
+    align-items: center;
+    margin-left: 15px;
+    cursor: pointer;
+    animation: fadeInAnimation ease 3s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+}
+
+.text-button-main-fade_out {
+    display: inline-flex;
+    background-color: gray;
+    color: black;
+    text-align: center;
+    height: 40px;
+    width: 180px;
+    padding-left: 25px;
+    align-items: center;
+    margin-left: 15px;
+    cursor: pointer;
+    animation: fadeInAnimation1 ease 3s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+}
+
+
+.animation-none {
+    display: inline-flex;
+    background-color: gray;
+    color: black;
+    text-align: center;
+    height: 40px;
+    width: 180px;
+    padding-left: 25px;
+    align-items: center;
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+.animation-shake-side {
+    display: inline-flex;
+    background-color: gray;
+    color: black;
+    text-align: center;
+    height: 40px;
+    width: 180px;
+    padding-left: 25px;
+    align-items: center;
+    margin-left: 15px;
+    cursor: pointer;
+    opacity: 0.8;
+    animation-name: shaker;
+    animation-duration: 0.2s;
+    transform-origin: 50% 50%;
+    animation-timing-function: linear;
+}
+
+.animation-shake-side:hover {
+    opacity: 1
+}
+
+@keyframes shaker {
+    0% {
+        transform: translate(20px, 0);
+    }
+
+    25% {
+        transform: translate(-20px, 0);
+    }
+
+    50% {
+        transform: translate(20px, 0);
+    }
+
+    75% {
+        transform: translate(-20px, 0);
+    }
+
+    100% {
+        transform: translate(20px, 0);
+    }
+}
+
+.animation-shake-up {
+    display: inline-flex;
+    background-color: gray;
+    color: black;
+    text-align: center;
+    height: 40px;
+    width: 180px;
+    padding-left: 25px;
+    align-items: center;
+    margin-left: 15px;
+    cursor: pointer;
+    animation-name: shakerVerticle;
+    animation-duration: 0.2s;
+    transform-origin: 50% 50%;
+    animation-timing-function: linear;
+}
+
+.animation-shake-up:hover {
+    opacity: 0.8;
+}
+
+@keyframes shakerVerticle {
+    0% {
+        transform: translate(0, 20px);
+    }
+
+    25% {
+        transform: translate(0, -20px);
+    }
+
+    50% {
+        transform: translate(0, 20px);
+    }
+
+    75% {
+        transform: translate(0, -20px);
+    }
+
+    100% {
+        transform: translate(0, 20px);
+    }
+}
+
+.animation-rotate {
+    display: inline-flex;
+    background-color: gray;
+    color: black;
+    text-align: center;
+    height: 40px;
+    width: 180px;
+    padding-left: 25px;
+    align-items: center;
+    margin-left: 15px;
+    cursor: pointer;
+    position: relative;
+    -webkit-transition-duration: 0.4s;
+    transition-duration: 0.4s;
+    overflow: hidden;
+    animation-name: spinner;
+    animation-duration: 500ms;
+    animation-timing-function: linear;
+}
+
+
+@keyframes spinner {
+    from {
+        transform: rotateZ(0) rotateX(360deg);
+    }
+
+    to {
+        transform: rotateZ(360deg) rotateX(-360deg);
+    }
+}
+
+.animation-fade_in {
+    display: inline-flex;
+    background-color: gray;
+    color: black;
+    text-align: center;
+    height: 40px;
+    width: 180px;
+    padding-left: 25px;
+    align-items: center;
+    margin-left: 15px;
+    cursor: pointer;
+    /* border-radius: 5px; */
+    /* box-shadow: 0 4px #c4c3c3; */
+    animation: fadeInAnimation ease 3s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+}
+
+.animation-fade_in:active {
+    /* box-shadow: 0 5px #c4c3c3; */
+    transform: translateY(4px);
+}
+
+@keyframes fadeInAnimation {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.animation-fade_out {
+    display: inline-flex;
+    background-color: gray;
+    color: black;
+    text-align: center;
+    height: 40px;
+    width: 180px;
+    padding-left: 25px;
+    align-items: center;
+    margin-left: 15px;
+    cursor: pointer;
+    animation: fadeInAnimation1 ease 3s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+}
+
+@keyframes fadeInAnimation1 {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.heart-icon-div {
+    background-image: url("../assets/heart.svg");
+}
+
+.icon-main {
+    display: inline-flex;
+    margin-top: -50px;
+    margin-left: 15px;
+}
+
+.skeleton-div {
+    position: absolute;
+    top: 340px;
+    margin-left: 215px;
+}
+
+
+.skeleton-div .heart-icon-div {
+    width: 20px;
+    height: 20px;
+    background-image: url("../assets/heart.svg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-color: transparent;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    margin-top: 15px;
+    margin-right: 5px;
+}
+
+.color-selector {
+    height: 40px;
+    width: 40px;
+    background-color: red;
+    display: inline-flex;
+    position: relative;
+    top: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 4px solid rgb(224, 224, 224);
+}
+
+.colorSelectorDiv {
+    background-color: red;
+    width: 400px;
+}
+
+select {
+    height: 30px;
+    border-radius: 5px;
+    font-size: 13px;
+}
+
+
+.choose-icon-div {
+    column-count: 3;
+    column-gap: 10px;
+    margin-top: -15px;
+}
+
+.chooseicon {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-color: transparent;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    margin-top: 13px;
+    margin-bottom: -3px;
+}
+
+
+.skeleton-div .chooseicon {
+    margin-top: -5px;
+}
+
+
+.heartICON {
+    background-image: url("../assets/heart.svg");
+}
+
+.starICON {
+    background-image: url("../assets/star.svg");
+}
+
+.saveICON {
+    background-image: url("../assets/save.svg");
+}
+
+.icon-shake-side {
+    animation-name: shaker;
+    animation-duration: 0.2s;
+    transform-origin: 50% 50%;
+    animation-timing-function: linear;
+}
+
+.icon-shake-up {
+    animation-name: shakerVerticle;
+    animation-duration: 0.2s;
+    transform-origin: 50% 50%;
+    animation-timing-function: linear;
+}
+
+.icon-rotate {
+    animation-name: spinner;
+    animation-duration: 500ms;
+    animation-timing-function: linear;
+}
+
+.icon-fade_in {
+    animation: fadeInAnimation ease 3s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+}
+
+.icon-fade_out {
+    animation: fadeInAnimation1 ease 3s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+}
+
+
+.inputColorMargin {
+    margin-top: -20px;
+}
+
+
+.Polaris-Header-Title__TitleWithSubtitle {
+    margin-top: 30px;
+}
+
+
+.customColorBox {
+    width: fit-content;
+    position: absolute;
+
+}
+
+/* .hoverBg .customColorBox , .hoverText .customColorBox , .hoverBdr .customColorBox{ */
+
+.inputColorCustomBox .customColorBox {
+    margin-left: -190px;
+    top: -175px;
+}
+
+
+
+/* .hoverText .customColorBox {
+    width: 0px;
+    top: -200px;
+    left: 0px;
+} */
+
+
+
+
+.customColorBox span {
+    /* float: right; */
+    margin-top: -15px;
+    margin-right: 0px;
+    background-color: black;
+    color: white;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+
+.inputColorCustom {
+    display: flex;
+}
+
+.inputColorCustom .color-selector {
+    margin-top: -15px;
+    margin-left: 10px;
+}
+
+.inputColorCustom .customColorBox {
+    /* margin-top: -130px; */
+    margin-left: -220px;
+    top: -35px;
+}
+
+/* .color-bottom {
+    display: flex;
+}
+
+.color-bottom .color-selector {
+    margin-top: -15px;
+    margin-left: 10px;
+} */
+
+.boxBdr .customColorBox {
+    margin-left: 0px;
+    right: 33rem;
+    top: 5rem;
+}
+
+
+
+
+
+
+
+
+
+
+.inputColorCustomBox {
+    display: flex;
+}
+
+.inputColorCustomBox.hoverBg,
+.inputColorCustomBox.hoverText {
+    display: inline-flex;
+}
+
+.inputColorCustomBox .color-selector {
+    margin-top: -15px;
+    margin-left: 10px;
+}
+
+
+
+
+
+
+.Polaris-Collapsible {
+    border-radius: 10px;
+    box-shadow: 0px 0px 8px rgb(196, 196, 196);
+}
+
+
+.customCodeBox {
+    column-count: 2;
+}
+
+/* .customCodeBox div {
+    background-color: red;
+} */
+
+textarea {
+    width: 100%;
+    height: 120px;
+}
+
+/* / -----------------------------  style for custom style component ----------------------------- / */
+
+.custom-style-main-div {
+    column-count: 2;
+}
+
+/* .custom-style-main-div div {
+    background-color: red; 
+} */
+
+.custom-style-main-div div input {
+    width: 100%;
+}
+
+/* #customColorDiv {
+    width: 35px;
+    height: 35px;
+    position: absolute;
+    top: 10px;
+} */
+
+input[type="color"] {
+    border: none;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0px;
+    border: 2px solid rgb(216, 215, 215);
+}
+
+input[type="color"]::-webkit-color-swatch {
+    border: none;
+}
+
+.linkCss {
+    color: #3054f7;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.css-input-div {
+    width: 40px;
+    text-align: center;
+    /* background-color: skyblue; */
+    position: relative;
+    margin-right: 3px;
+}
+
+.css-input-field {
+    width: 40px;
+    margin-right: 3px;
+    height: 30px;
+    margin-bottom: 15px;
+    border: 1px solid rgb(161, 160, 160);
+    border-radius: 5px;
+    text-align: center;
+}
+
+.css-input-label {
+    font-size: 7px;
+    text-transform: uppercase;
+    text-align: center;
+    position: absolute;
+    top: 25px;
+}
+
+.toggleBox {
+    padding: 10px;
+    background-color: #ebeaea;
+}
+
+/* label {
+    cursor: pointer;
+} */
+/* option {
+    cursor: pointer; 
+} */
+select {
+    cursor: pointer;
+}
+
+div#basic-collapsible\ collapse-hover {
+    width: 50%;
+}
+
+
+
+/* / -------------------pricing plan------------------ / */
+
+.addPlanBtn {
+    margin-top: 10px;
+}
+
+.highLight_div {
+    border: 1px solid black;
+    box-shadow: 0px 0px 10px gray;
+    border-radius: 8px;
+}
+
+.nohigh {
+    margin-top: -15px;
+}
+
+.highLight_div .nohigh {
+    margin-top: -35px;
+}
+
+.icon_div {
+    transform: translateY(-43px);
+    width: 30px;
+    margin-left: 250px
+}
+
+.basicClass {
+    height: auto;
+}
+
+.skeleton-div .animation-none {
+    display: block;
+}
+
+.skeleton-div .animation-shake-side {
+    display: block;
+}
+
+.skeleton-div .animation-shake-up {
+    display: block;
+}
+
+.skeleton-div .animation-rotate {
+    display: block;
+}
+
+.skeleton-div .animation-fade_in {
+    display: block;
+}
+
+.skeleton-div .animation-fade_out {
+    display: block;
+}
+
+.skeleton-div .text-button-main {
+    display: block;
+}
+
+.skeleton-div .text-button-main-up {
+    display: block;
+}
+
+.skeleton-div .text-button-main-ripple {
+    display: block;
+}
+
+.skeleton-div .text-button-main-fade_in {
+    display: block;
+}
+
+.skeleton-div .text-button-main-fade_out {
+    display: block;
+}
+
+
+
+
+
+
+.Polaris-LegacyCard {
+    box-shadow: 0px 0px 10px white !important;
+}
+
+/* .legacy-graph {
+    background-color: red;
+} */
+
+.disableEverything {
+    pointer-events: none;
+    color: #9f9f9f;
+    position: relative;
+}
+
+.upgradeButton {
+    height: 40px;
+    width: 100px;
+    background-color: rgb(163, 18, 18);
+    box-shadow: 0px 0px 5px gray;
+    border-radius: 10px;
+    color: white;
+    font-weight: 800;
+    text-align: center;
+    line-height: 39px;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer !important;
+    pointer-events: all;
+}
+
+.upgradeButton:hover {
+    background-color: rgb(117, 12, 12);
+    box-shadow: 0px 0px 5px gray;
+}
+
+.displayNone {
+    display: none;
+}
+
+
+#boxx-shadow .Polaris-LegacyCard {
+    box-shadow: 0px 0px 5px rgb(215, 215, 215) !important;
+    /* background-color: rgb(235, 235, 235); */
+    height: 100%;
+}
+
+.box-shadow {
+    border-radius: 7px;
+    box-shadow: 0px 0px 5px rgb(215, 215, 215);
+}
+
+
+.overview-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgb(240, 240, 240);
+    padding: 10px 7px;
+    border-radius: 7px;
+}
+
+.show-less-text {
+    max-width: 250px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.show-less-text:hover {
+    overflow: visible;
+    /* background-color: orange; */
+}

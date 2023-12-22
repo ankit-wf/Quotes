@@ -1,4 +1,3 @@
 # This file stores configurations for your Shopify app.
 
-scopes = "write_products,write_content,read_themes,write_themes,read_files,write_files"
-host = "http://localhost:5000"
+scopes = "write_products,write_content,read_themes,write_themes,read_files,write_files,write_draft_orders,read_orders,write_orders,read_merchant_managed_fulfillment_orders,read_fulfillments,write_fulfillments"

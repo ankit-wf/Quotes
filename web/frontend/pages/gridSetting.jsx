@@ -1,18 +1,17 @@
-import { Checkbox, Button } from '@shopify/polaris';
-import { useForm, Controller } from "react-hook-form";
-import "./css/myStyle.css"
-import { useAuthenticatedFetch } from '../hooks'
+
+import { useForm } from "react-hook-form";
+import "./css/myStyle.css";
+import { useAuthenticatedFetch } from '../hooks';
 import useApi from '../hooks/useApi';
 import { useEffect, useState } from 'react';
 
 const GridSetting = () => {
-  const fetch = useAuthenticatedFetch()
-  const metafieldHook = useApi()
-  const [id, setId] = useState("")
-  const { handleSubmit, control, reset,register } = useForm({});
+  const fetch = useAuthenticatedFetch();
+  const metafieldHook = useApi();
+  const [id, setId] = useState("");
+  const { handleSubmit, reset, register } = useForm({});
 
   useEffect(async () => {
-
     const metafieldId = await metafieldHook.metafield()
     setId(metafieldId)
     try {
@@ -21,18 +20,16 @@ const GridSetting = () => {
       let MetafieldArr = result.data.body.data.app.installation.metafields.edges
       MetafieldArr.find((f) => {
         if (f.node.key === "label-setting") {
-          let  val = JSON.parse(f.node.value)
+          let val = JSON.parse(f.node.value)
           return reset(val)
         }
       })
-
     } catch (error) {
       console.error("Error:", error);
     }
   }, [])
 
   const onSubmit = async (data) => {
-
     const labelGrid = {
       key: "grid-setting",
       namespace: "quotes-app",
@@ -49,11 +46,7 @@ const GridSetting = () => {
         },
         body: JSON.stringify(labelGrid),
       });
-      const result = await response.json();
-      if (result.status === "sucess") {
-        setData(result.msg)
-      }
-
+      await response.json();
     } catch (error) {
       console.error("Error:", error);
     }
@@ -61,19 +54,16 @@ const GridSetting = () => {
 
   return (
     <>
-    <form onSubmit={handleSubmit(onSubmit)}>    
-
-      <select {...register("grid")}>
-        <option value="" >
-          Select 
-        </option>
-        <option value="Single_Grid">One Column</option>
-        <option value="Two_Grid">Two Column</option>
-      </select>
-
-      <button type="submit" style={{marginLeft:'20px'}}>Submit </button>
-    </form>
-
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <select {...register("grid")}>
+          <option value="" >
+            Select
+          </option>
+          <option value="Single_Grid">One Column</option>
+          <option value="Two_Grid">Two Column</option>
+        </select>
+        <button type="submit" style={{ marginLeft: '20px' }}>Submit </button>
+      </form>
     </>
   );
 }

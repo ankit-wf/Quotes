@@ -1,38 +1,41 @@
 import React, { useEffect, useState } from 'react'
-import { Page, Grid, LegacyCard, Button, Icon, HorizontalStack, VerticalStack, HorizontalGrid } from '@shopify/polaris';
+import { Page, Grid, LegacyCard, Button, Icon, Text, Spinner } from '@shopify/polaris';
 import { useAuthenticatedFetch } from '../hooks'
 import useSubscriptionUrl from '../hooks/useSubscriptionUrl'
 import useApi from '../hooks/useApi';
 import { StatusActiveMajor } from '@shopify/polaris-icons';
 import './css/myStyle.css'
+import SmallSpinner from '../hooks/SmallSpinner';
+import { useNavigate } from 'react-router-dom';
+import createAppDataMetafields from '../../appDataMetaFild.js'
+import defaultMetafieldSetup from "../../defaultMetaFieldSetup.js";
+
 
 const PricingPlan = () => {
-  const subscription = useSubscriptionUrl()
-  const ShopApi = useApi()
-  const fetch = useAuthenticatedFetch()
-  const [shop, setShop] = useState()
-  const [status, setStatus] = useState("")
-  const [plandata, setPlandata] = useState([])
-  
-  let dataArr = []
-  let planName = ""
+  const customHooks = useApi();
+  const navigate = useNavigate();
+  const fetch = useAuthenticatedFetch();
+  const [shop, setShop] = useState();
+  const [status, setStatus] = useState("");
+  const [plandata, setPlandata] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [smallLoading, setSmallLoading] = useState(false);
+  const [planValue, setPlanValue] = useState("");
+  const [activeSub, setActiveSub] = useState("");
+  const [metaId, setMetaId] = useState("");
+  const [commonForm, setCommonForm] = useState();
 
   useEffect(async () => {
-    const shopApi = await ShopApi.shop()
+    const shopApi = await customHooks.shop();
+    const currentPlan = await customHooks.getCurrentPlan();
+    const metafieldId = await customHooks.metafield();
+    const commonFormData = customHooks.commonForm();
+    setCommonForm(commonFormData)
+    setMetaId(metafieldId);
     setShop(shopApi)
-
-    try {
-      const response = await fetch(`/api/subscription/planstatus`);
-      const result = await response.json();
-      dataArr = result.data
-      planName = await subscription.subscriptionArr(result.data)
-      if (planName === "") {
-        setStatus("Free")
-      }
-      setStatus(planName)
-    } catch (error) {
-      console.error("Error:", error);
-    }
+    setStatus(currentPlan.currentPlan)
+    setActiveSub(currentPlan.id)
+    setLoading(false)
 
     try {
       const response = await fetch(`/api/plan`);
@@ -41,83 +44,128 @@ const PricingPlan = () => {
     } catch (error) {
       console.error("Error:", error);
     }
-
+    getButtonIds(currentPlan.planId);
   }, [])
 
+
   const handleChange = async (value) => {
-    const returnData = `https://${shop.domain}/admin/apps/quotes-5`
-    const datas = {
-      plan: {
-        appRecurringPricingDetails: {
-          price: {
-            amount: value.amount,
-            currencyCode: "USD"
-          },
-          interval: "EVERY_30_DAYS"
+    setPlanValue(value.plan)
+    setSmallLoading(true)
+    if (value.id === 1) {
+      try {
+        const response = await fetch(`/api/subscription/cancel?id=${activeSub}`);
+        const result = await response.json();
+        if (result.msg === "Subscription Cancelled") {
+          setSmallLoading(false)
+          navigate('/');
         }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    } else {
+      const returnData = `https://${shop.domain}/admin/apps/quotes-app-2-o`
+
+      try {
+        const response = await fetch("/api/subscription/create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ price: value.amount, shop: shop.shopName, plan: value.plan, returnUrl: returnData }),
+        });
+        const result = await response.json();
+        const urlName = result.data.confirmation_url
+        const subscription = useSubscriptionUrl(urlName)
+        const data = defaultMetafieldSetup(metaId);
+        createAppDataMetafields(data[0]);
+        editForm();
+        subscription.ReloadPage();
+        setSmallLoading(false)
+      } catch (error) {
+        console.error("Error:", error);
       }
     }
-
-    try {
-      const response = await fetch("/api/subscription/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ data: datas, shop: shop.shopName, plan: value.plan, returnUrl: returnData }),
-      });
-      const result = await response.json();
-      const urlName = result.data.body.data.appSubscriptionCreate.confirmationUrl
-      const subscription = useSubscriptionUrl(urlName)
-
-      subscription.ReloadPage()
-
-    } catch (error) {
-      console.error("Error:", error);
-    }
-
   }
+
+  const editForm = async () => {
+    try {
+      const response = await fetch(`/api/deleteCustomForm?htmlForm=${JSON.stringify(commonForm.htmlForm)}&&xmlForm=${JSON.stringify(commonForm.defaultForm)}`)
+      await response.json()
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const getButtonIds = (id) => {
+    const button1 = document.getElementById('1');
+    const button2 = document.getElementById('2');
+    const button3 = document.getElementById('3')
+
+    if (id !== "") {
+      if (id === 1) {
+        button2.textContent = 'Upgrade';
+        button3.textContent = 'Upgrade';
+      } else if (id === 2) {
+        button1.textContent = 'Downgrade';
+        button3.textContent = 'Upgrade';
+      } else {
+        button1.textContent = 'Downgrade';
+        button2.textContent = 'Downgrade';
+      }
+    }
+  }
+
+
   return (
     <>
-      <Page fullWidth>
-      <Grid>
-      {plandata.map((data) => (
-        <Grid.Cell key={data.plan_id} columnSpan={{ xs: 4, sm: 4, md: 4, lg: 4, xl: 4 }}>
-          <div className={status === data.plan_name ? 'highLight_div' : 'basicClass'}>
-            <LegacyCard title={data.plan_name} sectioned>
-              <div className='basicClass'>
-                {status === data.plan_name ? (
-                  <div className='icon_div'>
-                    <Icon
-                      source={StatusActiveMajor}
-                      color='base'
-                      />
-                  </div>
-                ) : null}
-                <div>
-                  <p>Price ${data.price} / Month</p>
-                  <p>Email Quota {data.email_quota}</p>
-                  <p>Email notification</p>
-                 { data.plan_name === "Free" ? " " :
-                  <div className="addPlanBtn">
-                <Button onClick={() => handleChange({ amount: data.price, plan: data.plan_name })}>
-                  Upgrade
-                </Button>
-              </div>
-                 }
+      {loading ?
+        <div className='spinnerStyle'>
+          <Spinner accessibilityLabel="Small spinner example" size="large" />
+        </div>
+        :
+        <Page fullWidth>
+          <span className="topHeading"><Text variant="heading2xl" as="h3" >Pricing Plan</Text></span>
+          <Grid>
+            {plandata.map((data) => (
+              <Grid.Cell key={data.plan_id} columnSpan={{ xs: 4, sm: 4, md: 4, lg: 4, xl: 4 }}>
+                <div className={status === data.plan_name ? 'highLight_div' : 'basicClass'}>
+                  <LegacyCard title={data.plan_name} sectioned>
+                    <div className='basicClass'>
+                      {status === data.plan_name ? (
+                        <div className='icon_div'>
+                          <Icon
+                            source={StatusActiveMajor}
+                            color='base'
+                          />
+                        </div>
+                      ) : null}
+                      <div className='planFeature'>
+                        <p className='pricePera'>$<span>{data.price}</span>/mo</p>
+                        <p className='emailPera'>Email Quota {data.email_quota}</p>
+                        <p className='emailPera'>Email notification</p>
+                        {status !== data.plan_name ?
+                          <div className="addPlanBtn">
+                            {smallLoading && data.plan_name === planValue
+                              ?
+                              <SmallSpinner />
+                              :
+                              <Button id={data.plan_id} onClick={() => { handleChange({ amount: data.price, plan: data.plan_name, id: data.plan_id }) }}></Button>
+                            }
+                          </div>
+                          : ""
+                        }
+                      </div>
+                    </div>
+                  </LegacyCard>
                 </div>
-              </div>
-            </LegacyCard>
-          </div>
-        </Grid.Cell>
-      ))}
-    </Grid>
-
-      </Page>
-
+              </Grid.Cell>
+            ))}
+          </Grid>
+        </Page>
+      }
     </>
   )
 }
 
-export default PricingPlan
+export default PricingPlan;
 

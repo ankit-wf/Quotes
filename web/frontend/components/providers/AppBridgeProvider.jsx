@@ -40,7 +40,7 @@ export function AppBridgeProvider({ children }) {
       window.__SHOPIFY_DEV_HOST;
 
     window.__SHOPIFY_DEV_HOST = host;
-
+    
     return {
       host,
       apiKey: process.env.SHOPIFY_API_KEY,
@@ -48,6 +48,7 @@ export function AppBridgeProvider({ children }) {
     };
   });
 
+  
   if (!process.env.SHOPIFY_API_KEY || !appBridgeConfig.host) {
     const bannerProps = !process.env.SHOPIFY_API_KEY
       ? {

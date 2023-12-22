@@ -6,7 +6,6 @@ import { restResources } from "@shopify/shopify-api/rest/admin/2023-01";
 import { billingConfig } from "./billing.js";
 
 const DB_PATH = `${process.cwd()}/database.sqlite`;
-
 const shopify = shopifyApp({
   api: {
     apiVersion: LATEST_API_VERSION,

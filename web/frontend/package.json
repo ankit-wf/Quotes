@@ -21,6 +21,7 @@
     "bootstrap": "^5.2.3",
     "bootstrap-less": "^3.3.8",
     "buffer": "^6.0.3",
+    "css-filter-converter": "^1.0.109",
     "csv-parser": "^3.0.0",
     "formBuilder": "^3.8.3",
     "jquery": "^3.7.0",
@@ -39,6 +40,7 @@
     "react-router-dom": "^6.3.0",
     "recharts": "^2.6.2",
     "require": "^0.4.4",
+    "sweetalert2": "^11.10.1",
     "vite": "^2.8.6"
   },
   "devDependencies": {

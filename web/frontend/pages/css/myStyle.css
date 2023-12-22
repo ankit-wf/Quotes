@@ -83,10 +83,6 @@
     float: right;
 }
 
-.error {
-    color: red;
-}
-
 img.imgcss {
     /* height: 40px; */
     width: 100px;
@@ -141,32 +137,80 @@ img.imgcss {
     margin-top: 10px;
 }
 
+.addPlanBtn button {
+    width: 50%;
+}
+
 .highLight_div {
     border: 1px solid blue;
     border-radius: 8px;
-    height: 262px;
+    box-sizing: border-box;
+    box-shadow: rgba(136, 165, 191, 0.48) 6px 2px 16px 0px, rgba(255, 255, 255, 0.8) -6px -2px 16px 0px;
+}
+
+.Polaris-LegacyCard__Header h2 {
+    font-size: 26px;
+    text-align: center;
 }
 
 .icon_div {
-    /* margin-top:-43px; */
     transform: translateY(-43px);
     width: 30px;
-    margin-left: 250px
+    float: right;
+    margin-top: -25px;
+}
+
+.planFeature {
+    text-align: center;
+    font-size: 17px;
+    padding: 10px;
+    margin-top: 25px;
+}
+
+.pricePera {
+    margin-bottom: 15px;
+}
+
+.pricePera span {
+    font-size: 50px;
+}
+
+.emailPera {
+    margin-bottom: 10px;
 }
 
 .basicClass {
     height: 176px;
 }
 
+.quoteHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .searchBarStyle {
+    width: 35%;
+}
+
+.refreshButton {
+    margin-right: 10px;
+}
+
+.searchBarStyle input {
     top: 10px;
-    position: fixed;
     top: 0;
-    z-Index: 50;
-    width: 40%;
+    width: 100%;
     border-radius: 8px;
     padding: 7px 0 7px 15px;
     margin-left: 2%;
+}
+
+.buttonDiv {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 5px;
 }
 
 .spinnerStyle {
@@ -257,27 +301,255 @@ section {
 .email_main_Div {
     display: flex;
     justify-content: space-evenly;
-    border-bottom: 0.5px solid grey;
-    border-top: 0.5px solid grey;
     height: 80px;
 }
-.label_div{
+
+.label_div {
+    width: 45%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-top: 25px;
 }
-.input_width{
+
+.input_width {
     width: 300px;
     height: 30px;
 }
-.email_main2_Div{
-    display: flex;
-    justify-content: space-evenly;
-    border-bottom: 0.5px solid grey;
-    height: 60px;
-}
-.label2_div{
-    margin-top: 8px;
-}
-.btn_Div{
+
+.btn_Div {
     display: flex;
     justify-content: right;
+}
+
+
+
+.editHeaderInnerDiv .Polaris-Button {
+    margin-right: 10px;
+    cursor: pointer;
+    border-radius: 50%;
+    padding: 5px 10px;
+}
+
+.selectDiv {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+
+.selectOption {
+    width: 100%;
+    font-size: 14px;
+    padding: 6px;
+    margin: 5px;
+}
+
+.selectInnerDiv {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    margin-right: 10px;
+    width: 25%;
+}
+
+.selectDiv button {
+    margin-left: 20px;
+    padding: 5px;
+    font-size: 16px;
+    border-radius: 5px;
+    background: none
+}
+
+.selectDiv .submitButton {
+    margin-top: 20px;
+}
+
+.selectDiv button:hover {
+    background: rgb(221, 219, 219);
+}
+
+.submitButton {
+    margin-top: 20px;
+}
+
+.submitButton .smtpButton {
+    width: 45%;
+}
+
+.submitButton input {
+    font-size: 14px;
+    padding: 5px 10px;
+    background: none;
+    border-radius: 5px;
+}
+
+.submitButton span {
+    padding: 5px 10px;
+}
+
+.smtpSubmit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.submitButton input:hover {
+    background-color: rgb(97, 97, 97);
+}
+
+.quoteFormButton {
+    text-align: center;
+    margin: 10px;
+}
+
+.quoteFormButton button {
+    margin: 0px 5px;
+}
+
+.errorPera {
+    color: red;
+    margin: 7px 0px;
+}
+
+.freeSkeltonDiv {
+    position: relative;
+}
+
+.freeSeeMore {
+    position: absolute;
+    top: 60px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.freeSeeMore p {
+    margin-bottom: 15px;
+}
+
+.cancelPera {
+    margin-bottom: 10px;
+}
+
+.cancelPera span {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.recordSelect {
+    margin-left: 10px;
+}
+
+
+.emailDiv {
+    position: absolute;
+    top: 25%;
+    left: 37%;
+    z-index: 9999;
+    padding: 20px 80px;
+    box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
+}
+
+.emailDiv span {
+    font-size: 14px;
+}
+
+.closeDiv {
+    background: none;
+    margin-left: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.disableSendButton {
+    cursor: not-allowed;
+}
+
+.controllerDiv {
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+.canelPlanSpinner {
+    padding: 10px 50px;
+}
+
+.editPage {
+    padding: 20px;
+}
+
+.editHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.editHeaderInnerDiv {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.customerInfo {
+    padding: 5px 20px;
+    margin-bottom: 20px;
+}
+
+.productInfo {
+    padding: 5px 20px;
+    margin-bottom: 20px;
+}
+
+.customerInfo p {
+    font-size: 14px;
+    margin: 5px 0px;
+}
+
+.customerInfo p span {
+    text-transform: capitalize;
+    margin-right: 5px;
+}
+
+.fieldInput {
+    width: 50%;
+    outline: none;
+    border: none;
+    text-align: center;
+    border-bottom: 1px solid black;
+    font-size: 15px;
+    background: none;
+}
+
+.textareaDiv {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.remarksInput {
+    width: 50%;
+    margin-left: 10px;
+}
+
+
+.smallSpinOnSve {
+    margin-right: 30px;
+}
+
+.indexLoading {
+    margin-left: 60px; 
+}
+
+.productTitle {
+    cursor: pointer;
+}
+
+.productTitle:hover {
+    color: rgb(0, 68, 255);
+    text-decoration: underline;
 }

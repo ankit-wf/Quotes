@@ -1,25 +1,24 @@
-import { Checkbox, Button,Toast, Frame, } from '@shopify/polaris';
-import { useForm, Controller } from "react-hook-form";
-import "./css/myStyle.css"
-import { useAuthenticatedFetch } from '../hooks'
+import { Spinner } from '@shopify/polaris';
+import { useForm } from "react-hook-form";
+import { useAuthenticatedFetch } from '../hooks';
 import useApi from '../hooks/useApi';
-import { useEffect, useState,useCallback } from 'react';
+import { useEffect, useState } from 'react';
+import "./css/myStyle.css";
+import SmallSpinner from '../hooks/SmallSpinner';
 
 const LabelSetting = () => {
-  const fetch = useAuthenticatedFetch()
-  const metafieldHook = useApi()
-  const [id, setId] = useState("")
-
-  const { handleSubmit, control, reset, register } = useForm({});
-
-  const [active, setActive] = useState(false);
-  const toggleActive = useCallback(() => setActive((active) => !active), []);
-  const toastMarkup = active ? (
-    <Toast content="Save Settings" onDismiss={toggleActive} />
-  ) : null;
-
+  const fetch = useAuthenticatedFetch();
+  const metafieldHook = useApi();
+  const [id, setId] = useState("");
+  const { handleSubmit, reset, register } = useForm({});
+  const [loading, setLoading] = useState(true);
+  const [smallLoading, setSmallLoading] = useState(false);
+  const swtAltMsg = { title: "Successfully Updated", text: "Your data has been updadted successfully", isSwtAlt: true, smallSpinner: setSmallLoading };
+  
+  
+  
+  
   useEffect(async () => {
-
     const metafieldId = await metafieldHook.metafield()
     setId(metafieldId)
 
@@ -33,7 +32,7 @@ const LabelSetting = () => {
           return reset(val)
         }
       })
-
+      setLoading(false)
     } catch (error) {
       console.error("Error:", error);
     }
@@ -44,19 +43,17 @@ const LabelSetting = () => {
       let MetafieldArr = result.data.body.data.app.installation.metafields.edges
       MetafieldArr.find((f) => {
         if (f.node.key === "grid-setting") {
-          let  val = JSON.parse(f.node.value)
+          let val = JSON.parse(f.node.value)
           return reset(val)
         }
       })
-
     } catch (error) {
       console.error("Error:", error);
     }
-
   }, [])
 
   const onSubmit = async (data) => {
-
+    setSmallLoading(true)
     const customerData = {
       key: "label-setting",
       namespace: "quotes-app",
@@ -64,80 +61,42 @@ const LabelSetting = () => {
       type: "single_line_text_field",
       value: JSON.stringify(data)
     };
-
-    try {
-      const response = await fetch("/api/app-metafield/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(customerData),
-      });
-      const result = await response.json();
-      if (result.status === "sucess") {
-        setData(result.msg)
-      }
-
-    } catch (error) {
-      console.error("Error:", error);
-    }
-
-    const labelGrid = {
-      key: "grid-setting",
-      namespace: "quotes-app",
-      ownerId: `${id}`,
-      type: "single_line_text_field",
-      value: JSON.stringify(data)
-    };
-
-    try {
-      const response = await fetch("/api/app-metafield/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(labelGrid),
-      });
-      const result = await response.json();
-      if (result.status === "sucess") {
-        setData(result.msg)
-      }
-
-    } catch (error) {
-      console.error("Error:", error);
-    }
-
+    await metafieldHook.createAppMetafield(customerData, swtAltMsg);
   }
 
   return (
-    <>
+    loading ?
+      <div className='spinnerStyle'>
+        <Spinner accessibilityLabel="Small spinner example" size="large" />
+      </div>
+      :
       <form onSubmit={handleSubmit(onSubmit)}>
-        
-        <select {...register("label")}>
-          <option value="" >
-            Select
-          </option>
-          <option value="left_label">left_label</option>
-          <option value="Placholder">Placholder</option>
-          <option value="Upper_Label">Upper_Label</option>
-        </select>
-      
-        <select {...register("grid")} style={{marginLeft:'20px'}}>
-        <option value="" >
-          Select 
-        </option>
-        <option value="Single_Grid">One Column</option>
-        <option value="Two_Grid">Two Column</option>
-      </select>
-     
-      <Frame>
-        <button type="submit" onClick={toggleActive} style={{ marginLeft: '25%' }}>Submit </button>
-          {toastMarkup}
-      </Frame>
-   
-      </form>
+        <div className='selectDiv'>
+          <div className='selectInnerDiv'>
+            <label>Label Position</label>
+            <select {...register("label")} className='selectOption'>
+              <option value="">Select</option>
+              <option value="left_label">left_label</option>
+              <option value="Placholder">Placholder</option>
+              <option value="Upper_Label">Upper_Label</option>
+            </select>
+          </div>
 
-    </>
+          <div className='selectInnerDiv'>
+            <label>Select Column</label>
+            <select {...register("grid")} className='selectOption'>
+              <option value="">Select</option>
+              <option value="Single_Grid">One Column</option>
+              <option value="Two_Grid">Two Column</option>
+            </select>
+          </div>
+
+          <div className='submitButton'>
+            {smallLoading ? <SmallSpinner /> : <input type="submit" />}
+          </div>
+        </div>
+      </form>
   );
 }
 export default LabelSetting;
+
