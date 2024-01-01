@@ -2,21 +2,21 @@ import { join } from "path";
 import { readFileSync } from "fs";
 import express from "express";
 import serveStatic from "serve-static";
-import cors from 'cors'
+import cors from 'cors';
 import shopify from "./shopify.js";
 import productCreator from "./product-creator.js";
 import GDPRWebhookHandlers from "./gdpr.js";
-import db from './Database.js'
-import nodemailer from 'nodemailer';
+import db from './Database.js';
 import useMetafields from "./useMetafields.js";
 import { LocalStorage } from "node-localstorage";
 import bodyParser from "body-parser";
 import multer from "multer";
 import path from "path";
 import fs from 'fs';
-import edit from './Images.js'
-import createAppDataMetafields from './appDataMetaFild.js'
+import edit from './Images.js';
+import createAppDataMetafields from './appDataMetaFild.js';
 import defaultMetafieldSetup from "./defaultMetaFieldSetup.js";
+import sendEmail from './sendEmail.js';
 
 const PORT2 = 5000;
 const PORT = parseInt(
@@ -74,7 +74,7 @@ const setDefaultDataForApp = async (req, res, next) => {
       }
     }`
   });
-  
+
   const dataArr = defaultMetafieldSetup(data.body.data.currentAppInstallation.id);
   let ourQuery = await createAppDataMetafields(dataArr[0]);
   await client.query({
@@ -210,6 +210,12 @@ app.get("/api/getshop", async (_req, res) => {
       update: true,
     });
   }
+
+  // const AA = await shopify.api.rest.Webhook.all({
+  //   session: res.locals.shopify.session,
+  // });
+  // console.log("Aaaaaaaaaaaaaaaaaaa",AA)
+
   res.status(200).send({ countData });
 })
 
@@ -241,7 +247,7 @@ app.post("/api/subscription/create", async (req, res) => {
 
     recurring_application_charge.return_url = req.body.returnUrl;
   recurring_application_charge.price = req.body.price,
-    recurring_application_charge.trial_days = 0;
+    recurring_application_charge.trial_days = req.body.trial;
   const data = await recurring_application_charge.save({
     update: true,
   });
@@ -280,6 +286,36 @@ app.get("/api/plan/emailQuota", (req, res) => {
       console.log("err", err)
     } else {
       res.send({ result: result, msg: "success" })
+    }
+  })
+})
+
+app.get("/api/remainingQuote", async (req, res) => {
+  db.query("SELECT COUNT(*) as count FROM Quotes WHERE shop_name=" + req.query.shop + "AND DATE(create_date) >= '" + req.query.startDate + "' AND DATE(create_date) <= '" + req.query.lastDate + "'", (err, result) => {
+    if (err) {
+      console.log("err", err)
+    } else {
+      res.send({ result: result[0].count })
+    }
+  })
+})
+
+app2.get("/api/plan/emailQuota", (req, res) => {
+  db.query("SELECT * FROM `Plan` WHERE plan_name=" + req.query.planName + "", (err, result) => {
+    if (err) {
+      console.log("err", err)
+    } else {
+      res.send({ result: result, msg: "success" })
+    }
+  })
+})
+
+app2.get("/api/remainingQuote", async (req, res) => {
+  db.query("SELECT COUNT(*) as count FROM Quotes WHERE shop_name=" + req.query.shop + "AND DATE(create_date) >= '" + req.query.startDate + "' AND DATE(create_date) <= '" + req.query.lastDate + "'", (err, result) => {
+    if (err) {
+      console.log("err", err)
+    } else {
+      res.send({ result: result[0].count })
     }
   })
 })
@@ -644,16 +680,6 @@ app.get("/api/deleteCustomForm", async (req, res) => {
   }
 })
 
-app.get("/api/remainingQuote", async (req, res) => {
-  db.query("SELECT COUNT(*) as count FROM Quotes WHERE shop_name=" + req.query.shop + " AND create_date >= '" + req.query.startDate + "' AND create_date <= '" + req.query.lastDate + "'", (err, result) => {
-    if (err) {
-      console.log("err", err)
-    } else {
-      res.send({ result: result[0].count })
-    }
-  })
-})
-
 app.get('/api/quote_To_order', async (req, res) => {
   let newArr = JSON.parse(req.query.data)
 
@@ -688,20 +714,35 @@ app.get("/api/product/getproductstats", (req, res) => {
 })
 
 app2.post("/quote/createquote", (req, res) => {
-  let shop = req.body.shop;
-  let UserArr = req.body.userArr;
+  const shop = req.body.shop;
+  const userArr = req.body.userArr;
   let entries;
-  var totalQuantity = 0;
-  var totalPrice = 0;
+  console.log("gggggggggggggg", req.body)
+  console.log("hhhhhhhhhhhhhhhhhh", shop)
+  let totalQuantity = 0;
+  let totalPrice = 0;
 
-  console.log("UserArrUserArrUserArrUserArrUserArrUserArr", UserArr)
+  let userEmail = getEmailFromArray(JSON.parse(userArr));
+
+  function getEmailFromArray(arr) {
+    for (let i = 0; i < arr.length; i++) {
+      const obj = arr[i];
+      if (obj.hasOwnProperty("email")) {
+        return obj["email"];
+      }
+    }
+    return null;
+  }
+
+
   for (let i = 0; i < req.body.detailArr_data.length; i++) {
     const element = JSON.parse(req.body.detailArr_data[i].variants);
     entries = Object.entries(element);
 
-    var item = req.body.detailArr_data[i];
-    var quantity = parseInt(item.quantity, 10);
-    var price = parseFloat(item.price);
+    const item = req.body.detailArr_data[i];
+    const quantity = parseInt(item.quantity, 10);
+    const price = parseFloat(item.price);
+
     if (!isNaN(quantity) && !isNaN(price)) {
       totalQuantity += quantity;
       totalPrice += quantity * price;
@@ -710,192 +751,256 @@ app2.post("/quote/createquote", (req, res) => {
     }
   }
 
-  db.query("INSERT INTO `Quotes`(`shop_name`,`user_data`,`total_order_amount`,`total_products`) VALUES ('" + shop.shop_name + "','" + UserArr + "','" + totalPrice + "','" + req.body.detailArr_data.length + "')", (err, result) => {
-    if (err) {
-      console.log("QuotesInsert if", err);
-      return res.status(500).json({
-        status: "error",
-        message: "Internal Server Error",
-      });
-    }
-
-    let insertedQuotes = result.insertId;
-    let insertedCount = 0;
-
-    for (let i = 0; i < req.body.detailArr_data.length; i++) {
-      db.query("INSERT INTO `QuotesDetail`(`quote_id`,`quantity`,`price`,`product_image`, `variants`, `variants_id`,`product_name`,`product_handle`) VALUES ('" + insertedQuotes + "','" + req.body.detailArr_data[i].quantity + "','" + req.body.detailArr_data[i].price + "','" + req.body.detailArr_data[i].image + "','" + req.body.detailArr_data[i].variants + "','" + req.body.detailArr_data[i].variantId + "','" + req.body.detailArr_data[i].title + "','" + req.body.detailArr_data[i].handle + "')", (err, result) => {
-        if (err) {
-          console.error("Error inserting into QuotesDetail:", err);
-        } else {
-          insertedCount++;
-          if (insertedCount === req.body.detailArr_data.length) {
-            sendEmailAndRespond();
-          }
-        }
-      }
-      );
-    }
-  });
-
-  function sendEmailAndRespond() {
-    const currentDate = new Date();
-    const formattedDateTime = `${currentDate.getDate().toString().padStart(2, '0')}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getFullYear()} ${currentDate.getHours().toString().padStart(2, '0')}:${currentDate.getMinutes().toString().padStart(2, '0')}:${currentDate.getSeconds().toString().padStart(2, '0')}`;
-
-
-    let message = "";
-    entries.map(([key, val] = entry) => {
-      return message += `<span ><b>${key}</b> : ${val} </span> `;
-    });
-    let divTag = "";
-
-    JSON.parse(UserArr).map((item, index) => {
-      const key = Object.keys(item)[0];
-      const value = Object.values(item)[0];
-      return (
-        divTag += `<div style="margin-left:38px" key=${index}>${key}: ${value}</div>`
-      )
-    })
-
-    db.query("SELECT * FROM EmailSMTP WHERE shop_name='" + shop.shop_name + "'", (err, result) => {
-      console.log("check EMAIL SMTP result", result);
+  db.query(
+    "INSERT INTO `Quotes`(`shop_name`,`user_data`,`total_order_amount`,`total_products`) VALUES (?, ?, ?, ?)",
+    [shop.shop_name, userArr, totalPrice, req.body.detailArr_data.length],
+    async (err, result) => {
       if (err) {
-        console.log("err", err);
+        console.log("QuotesInsert if", err);
         return res.status(500).json({
           status: "error",
           message: "Internal Server Error",
         });
-      } else {
-        let transporter = nodemailer.createTransport({
-          host: result[0].smtp_server,
-          port: result[0].port,
-          secure: false,
-          auth: {
-            user: result[0].user_email,
-            pass: result[0].password
-          },
-        });
-
-        let content = ""
-        content += `<div style="width:700px;margin:auto;">
-          <div>
-            <table style="width:100%;max-width:100%;margin-bottom:20px;font-size:16px;background:#00387f">
-              <thead>
-                <tr>
-                  <th style="text-align:left">
-                    <div style="padding:15px">
-                      <div style="max-height:60px;max-width:100px;margin-right:auto">
-                      </div>
-                    </div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <div style="margin:0 12px;color:#ffffff;text-align:center">
-                      <h2>Request a quote - Company Name</h2>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div style="padding:15px;background:#fbfbfb">
-            <div>
-              <table style="width:100%;max-width:100%;margin:20px 0;font-size:16px">
-                <tbody>
-                  <tr>
-                    <td>
-                      <div style="display:flex">
-                        <img src="https://img.icons8.com/?id=3225&format=png"
-                          style="  width: 21px; height: 21px" alt="">
-                          <span style="margin-left:15px">CUSTOMER INFORMATION</span>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div style="margin-left:38px">Create At: ${formattedDateTime}</div>
-                      ${divTag}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div>
-            <div style="font-size:18px;margin-top:24px">
-              Quote form information:
-            </div>`
-
-        {
-          req.body.detailArr_data.map((data, i) => {
-            content += `<div style="background:#fff;padding:10px">
-                <table style="width:100%;max-width:100%;margin-bottom:20px;font-size:16px">
-                  <tbody>
-                    <tr>
-                      <td style="border-top:1px solid #f1f1f6">
-                        <div style="display:flex">
-                          <img src='${data.image}' alt='${data.image}'
-                            style="max-width:120px;padding:15px 15px 15px 0">
-                            <div>
-                              <p style="font-weight:600">${data.title}</p>
-                              ${message}
-                            </div>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>`
-          })
-        }
-
-        content += `</div>
-        </div>`
-
-        transporter.sendMail({
-          headers: {
-            From: result[0].user_email,
-            // To: shop.admin_email,
-            To: "rajeev.webframez@gmail.com",
-            Subject: shop.subject,
-          },
-          html: content
-        });
-
-        res.status(200).json({
-          status: "success",
-          message: "Data Saved Successfully",
-        });
       }
-    });
+
+      const insertedQuotes = result.insertId;
+      let insertedCount = 0;
+
+      for (let i = 0; i < req.body.detailArr_data.length; i++) {
+        db.query(
+          "INSERT INTO `QuotesDetail`(`quote_id`,`quantity`,`price`,`product_image`, `variants`, `variants_id`,`product_name`,`product_handle`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+          [
+            insertedQuotes,
+            req.body.detailArr_data[i].quantity,
+            req.body.detailArr_data[i].price,
+            req.body.detailArr_data[i].image,
+            req.body.detailArr_data[i].variants,
+            req.body.detailArr_data[i].variantId,
+            req.body.detailArr_data[i].title,
+            req.body.detailArr_data[i].handle,
+          ],
+          (err, result) => {
+            if (err) {
+              console.error("Error inserting into QuotesDetail:", err);
+            } else {
+              insertedCount++;
+              if (insertedCount === req.body.detailArr_data.length) {
+                sendEmailAndRespond();
+              }
+            }
+          }
+        );
+      }
+    }
+  );
+
+  async function sendEmailAndRespond() {
+    const currentDate = new Date();
+    const formattedDateTime = `${currentDate.getDate().toString().padStart(2, '0')}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getFullYear()} ${currentDate.getHours().toString().padStart(2, '0')}:${currentDate.getMinutes().toString().padStart(2, '0')}:${currentDate.getSeconds().toString().padStart(2, '0')}`;
+    let message = "";
+    let divTag = "";
+    let content = "";
+    let userContent = "";
+    let emailOver = "";
+    let data = null;
+    let dataUser = null;
+    let autoEmailOver = null;
+
+    try {
+      entries.map(([key, val] = entry) => {
+        return message += `<span ><b>${key}</b> : ${val} </span> `;
+      });
+
+      JSON.parse(userArr).map((item, index) => {
+        const key = Object.keys(item)[0];
+        const value = Object.values(item)[0];
+        return (
+          divTag += `<div key=${index}><span style="text-transform:capitalize">${key}</span>: ${value}</div>`
+        )
+      })
+
+      db.query("SELECT * FROM EmailSMTP WHERE shop_name='" + shop.shop_name + "'", (err, result) => {
+        if (err) {
+          console.log("err", err);
+        } else {
+          content += `<div style="width:700px;margin:auto;">
+            <div style="display: flex; background: #00387f; font-size: 16px; margin-bottom: 20px; height: 70px;">
+              <h2 style="margin:auto">Request a quote - ${shop.companyName}</h2>
+            </div>
+  
+            <div>
+              <div style="display:flex; font-size:16px;">
+                <img src="https://img.icons8.com/?id=3225&format=png" style="  width: 15px; height: 15px" alt="">
+                <span style="margin-left:15px">CUSTOMER INFORMATION</span>
+              </div>
+  
+              <div style="margin-left:30px;">
+                <div>Created At: ${formattedDateTime}</div>
+                ${divTag}
+              </div>
+            </div>
+  
+  
+            <div style="margin-top:24px;">
+              <div style="font-size:16px; display:flex;">
+                <img src="https://img.icons8.com/?id=49&format=png" alt="" style="width: 15px; height: 15px" />
+                <span style="margin-left:15px">QUOTE INFORMATION</span>
+              </div>`
+
+          {
+            req.body.detailArr_data.map((data, i) => {
+              content += `<div style="background:#fff; margin-left:30px;">
+                      <table style="width:100%;max-width:100%;margin-bottom:20px;font-size:16px">
+                        <tbody>
+                          <tr>
+                            <td style="border-top:1px solid #f1f1f6">
+                              <div style="display:flex">
+                                <img src='${data.image}' alt='${data.image}'
+                                  style="max-width:120px;padding:15px 15px 15px 0">
+                                  <div>
+                                    <p style="font-weight:600">${data.title}</p>
+                                    ${message}
+                                  </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>`
+            })
+          }
+
+          content += `</div>
+          </div>`
+
+
+          userContent += `<div style="width:700px;margin:auto; color:white;">
+            <div style="display: flex; background: #00387f; font-size: 16px; margin-bottom: 20px; height: 70px;">
+              <h2 style="margin:auto">Request a quote - ${shop.companyName}</h2>
+            </div>
+  
+            <div syle="font-size: 16px; color: white;">
+              Thanks Dear, we have recieved your quote request. We will get back to you very soon.
+            </div>
+  
+  
+            <div style="margin-top:24px;">
+              <div style="font-size:16px; display:flex;">
+                <img src="https://img.icons8.com/?id=49&format=png" alt="" style="width: 15px; height: 15px" />
+                <span style="margin-left:15px">QUOTE INFORMATION</span>
+              </div>`
+
+          {
+            req.body.detailArr_data.map((data, i) => {
+              userContent += `<div style="background:#fff; margin-left:30px;">
+                      <table style="width:100%;max-width:100%;margin-bottom:20px;font-size:16px">
+                        <tbody>
+                          <tr>
+                            <td style="border-top:1px solid #f1f1f6">
+                              <div style="display:flex">
+                                <img src='${data.image}' alt='${data.image}'
+                                  style="max-width:120px;padding:15px 15px 15px 0">
+                                  <div>
+                                    <p style="font-weight:600">${data.title}</p>
+                                    ${message}
+                                  </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>`
+            })
+          }
+
+          userContent += `</div>
+          </div>`
+
+
+          emailOver += `<div>
+            <div style="display: flex; background: #00387f; font-size: 16px; margin-bottom: 20px; height: 70px;">
+              <h2 style="margin:auto">Request a quote - ${shop.companyName}</h2>
+            </div>
+
+            <div style="font-size: 14px; color: white;">
+              Hello Dear, Your Quote limit has been reached to 100% and ${req.body.totalQuote - JSON.parse(req.body.emailQuota)} customers have requested a quote, To see these emails please upgrade your plan by clicking here <a href="https://admin.shopify.com/store/${shop.shop_name}/apps/quotes-app-2-o/pricingplan" style="color: blue; text-decoration: underline; cursor: pointer;">Upgrade</a>.
+            </div>
+          </div>`
+
+          data = { result: result, content: content, shop: shop, isUser: userEmail, isTrue: false, alert: false }
+          dataUser = { result: result, content: userContent, shop: shop, isUser: userEmail, isTrue: true, alert: false }
+          autoEmailOver = { result: result, content: emailOver, shop: shop, isUser: "", isTrue: false, alert: true }
+
+          if (req.body.totalQuote <= JSON.parse(req.body.emailQuota)) {
+            sendEmail(data);
+            sendEmail(dataUser);
+          } else {
+            sendEmail(dataUser)
+            sendEmail(autoEmailOver)
+          }
+          res.status(200).json({
+            status: "success",
+            message: "Data Saved Successfully",
+          });
+        }
+      });
+    } catch (error) {
+      console.error("Unexpected error:", error);
+    }
   }
 });
 
+app2.post("/sendAutoEmail", (req, res) => {
+  const shop = req.body.shop;
+  let autoEmailContent = "";
+  let autoEmail;
+  let quoteValue;
+
+  db.query("SELECT * FROM EmailSMTP WHERE shop_name='" + shop.shop_name + "'", (err, result) => {
+    if (err) {
+      console.log("err", err);
+    } else {
+      if (req.body.finalEmailQuote === 50) {
+        quoteValue = 50;
+      } else if (req.body.finalEmailQuote === 80) {
+        quoteValue = 80;
+      } else if (req.body.finalEmailQuote === 100) {
+        quoteValue = 100;
+      }
+
+      autoEmailContent += `<div>
+        <div style="display: flex; background: #00387f; font-size: 16px; margin-bottom: 20px; height: 70px;">
+          <h2 style="margin:auto">Request a quote - ${shop.companyName}</h2>
+        </div>
+    
+        <div style="font-size: 14px; color: white;">
+          Hello Dear, Your Quote limit has been reached to ${quoteValue}%. Please upgrade our plan by clicking here <a href="https://admin.shopify.com/store/${shop.shop_name}/apps/quotes-app-2-o/pricingplan" style="color: blue; text-decoration: underline; cursor: pointer;">Upgrade</a>, Otherwise you would not be able to recieve any email.
+        </div>
+      </div>`
+
+
+      autoEmail = { result: result, content: autoEmailContent, shop: shop, isUser: "", isTrue: false, alert: true }
+
+      if (req.body.finalEmailQuote === 50 || req.body.finalEmailQuote === 3 || req.body.finalEmailQuote === 100 && JSON.parse(req.body.emailQuota) === req.body.totalQuote) {
+        sendEmail(autoEmail)
+      }
+
+      res.status(200).json({
+        status: "success",
+        message: "Data Saved Successfully",
+      });
+    }
+  })
+})
+
 app.post("/api/testemail", async (_req, res) => {
   let request = _req.body
+  let content = "";
   db.query("SELECT *  FROM EmailSMTP WHERE shop_name='" + _req.body.shopName + "' ", (err, result) => {
     if (err) {
       console.log("err", err)
     } else {
-      let transporter = nodemailer.createTransport({
-        host: result[0].smtp_server,
-        port: result[0].port,
-        secure: false,
-        auth: {
-          user: result[0].user_email,
-          pass: result[0].password
-        },
-      });
-
-      transporter.sendMail({
-        headers: {
-          From: request.email,
-          To: "rajeev.webframez@gmail.com",
-          Subject: request.subject,
-        },
-        html: `
+      content += `
         <div style="width:700px;margin:auto;">
         <div>
           <table style="width:100%;max-width:100%;margin-bottom:20px;font-size:16px;background:#00387f">
@@ -983,12 +1088,14 @@ app.post("/api/testemail", async (_req, res) => {
             </table>
           </div>
         </div>
-      </div>
-        `
-      }).then(res.send({ msg: "success" }))
-        .catch(err => {
-          console.log("console_check", err);
-        });
+      </div>`
+
+      let data = { result: result, content: content, isUser: request.email, isTrue: false, subject: request.subject }
+      sendEmail(data)
+      res.status(200).json({
+        status: "success",
+        message: "Data Saved Successfully",
+      });
     }
   })
 })
@@ -1032,7 +1139,7 @@ app.get("/api/products/create", async (_req, res) => {
 });
 
 app.post("/api/emailSMTP_data", async (req, res) => {
-  db.query("INSERT INTO EmailSMTP ( driver, smtp_server, user_email, password, port, from_email, shop_name) VALUES ('" + req.body.driver + "','" + req.body.smtp_server + "','" + req.body.user_email + "','" + req.body.password + "','" + req.body.port + "','" + req.body.from_email + "','" + req.body.shop_name + "')", (err, results) => {
+  db.query("INSERT INTO EmailSMTP ( driver, smtp_server, user_email, password, port, shop_name) VALUES ('" + req.body.driver + "','" + req.body.smtp_server + "','" + req.body.user_email + "','" + req.body.password + "','" + req.body.port + "','" + req.body.shop_name + "')", (err, results) => {
     if (err) {
       console.log("err", err)
     } else {
@@ -1083,25 +1190,25 @@ app.use("/*", shopify.ensureInstalledOnShop(), async (_req, res, _next) => {
     .send(readFileSync(join(STATIC_PATH, "index.html")));
 });
 
-app.post("/quotes/productstatus", (req, res) => {
-  const data = db.query("SELECT * FROM `ProductStats` WHERE product_id='" + req.body.productId + "' AND shop_name='" + req.body.shopName + "'", (err, result) => {
-    if (err) {
-      console.log("first", err)
-    } else {
-      res.send({ data: result, msg: "success" })
-    }
-  })
-})
+// app.post("/quotes/productstatus", (req, res) => {
+//   const data = db.query("SELECT * FROM `ProductStats` WHERE product_id='" + req.body.productId + "' AND shop_name='" + req.body.shopName + "'", (err, result) => {
+//     if (err) {
+//       console.log("first", err)
+//     } else {
+//       res.send({ data: result, msg: "success" })
+//     }
+//   })
+// })
 
-app.post("/quotes/productstatus", (req, res) => {
-  const data = db.query("INSERT INTO `ProductStats`(`shop_name`, `product_id`, `product_name`, `product_variants`, `views`, `clicks`, `conversions`) VALUES ('[value-2]','[value-3]','[value-4]','[value-5]','[value-6]','[value-7]','[value-8]')", (err, result) => {
-    if (err) {
-      console.log("first", err)
-    } else {
-      res.send("ok")
-    }
-  })
-})
+// app.post("/quotes/productstatus", (req, res) => {
+//   const data = db.query("INSERT INTO `ProductStats`(`shop_name`, `product_id`, `product_name`, `product_variants`, `views`, `clicks`, `conversions`) VALUES ('[value-2]','[value-3]','[value-4]','[value-5]','[value-6]','[value-7]','[value-8]')", (err, result) => {
+//     if (err) {
+//       console.log("first", err)
+//     } else {
+//       res.send("ok")
+//     }
+//   })
+// })
 
 export { orderStatusFunc };
 
@@ -1112,3 +1219,8 @@ app.listen(PORT, () => {
 app2.listen(PORT2, () => {
   console.log("Started server on PORT2");
 });
+
+// userContent += `<div style="width:700px;margin:auto; color:white;">
+//             <div syle="font-size: 16px; color: white;">
+//               Hello Dear, you have used your 50% of quotes. Please subscribe to our Premium plan to get unlimited quotes.
+//             </div></div>`

@@ -173,6 +173,7 @@ const QuoteForm = () => {
       const doc2 = parser2.parseFromString(modifiedHTMLString, 'text/html');
 
       const inputElements2 = doc2.querySelectorAll('.rendered-form input, .rendered-form textarea, .rendered-form select');
+      console.log("gggggggggggggg", inputElements2)
       inputElements2.forEach(input => {
         const labelForAttribute = input.parentElement.querySelector('label').textContent.trim();
         const formattedId = labelForAttribute.toLowerCase().replace(/[^\w\s]/g, "");
@@ -180,6 +181,23 @@ const QuoteForm = () => {
         input.id = formattedId;
         input.setAttribute('onfocus', 'onFocusHandler');
       });
+
+      const aa = doc2.querySelectorAll(".rendered-form .formbuilder-checkbox-group")
+      console.log("aaaaaaaaaa", aa)
+      const bb = doc2.querySelectorAll(".checkbox-group input")
+      console.log("bbbbbbbbb",bb)
+      // const labelForAttribute = doc2.querySelectorAll(".checkbox-group label");
+      // console.log("ddddddddd", labelForAttribute)
+      // const formattedId = labelForAttribute[0].textContent.trim().toLowerCase().replace(/[^\w\s]/g, "");
+      // console.log("cccccccccc",formattedId)
+
+      // bb.forEach(input => {
+      //   const labelForAttribute = aa.parentElement.querySelector('label').textContent.trim();
+      //   const formattedId = labelForAttribute.toLowerCase().replace(/[^\w\s]/g, "");
+      //   input.name = formattedId;
+      //   input.id = formattedId;
+      //   input.setAttribute('onfocus', 'onFocusHandler');
+      // })
 
 
       const tokenArray = [];

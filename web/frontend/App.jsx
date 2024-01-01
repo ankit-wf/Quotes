@@ -6,6 +6,7 @@ import {
   QueryProvider,
   PolarisProvider,
 } from "./components";
+import { useEffect } from 'react';
 
 export default function App() {
   const config = {
@@ -37,7 +38,6 @@ export default function App() {
   //   }),
   //   [location, navigate],
   // );
-
 
 
 

@@ -36,6 +36,7 @@ const QuoteList = () => {
   const [data, setData] = useState([]);
   const [csvData, setCsvData] = useState([]);
   const paginationFunc = pagination.pagination(totalRecord, listingPerPage);
+  const [planId, setPlanId] = useState();
   let map = new Map();
   map.set("a", { val: paginationFunc.firstPost });
   map.get("a").val++;
@@ -71,13 +72,15 @@ const QuoteList = () => {
     };
 
     return (
-      <span><Button onClick={handleDownload}>Download CSV</Button></span>
+      <span className={`${planId === 1 && 'disabledButton'}`}><Button onClick={handleDownload} disabled={planId ===1 && true}>Download CSV</Button></span>
     );
   }
 
 
   useEffect(async () => {
     const shopApi = await ShopApi.shop();
+    const planId = await ShopApi.getCurrentPlan();
+    setPlanId(planId.planId)
     setListingPerPage(getLocalListPerPage)
     shop.current = shopApi;
     await csvApi(shop.current);
@@ -189,8 +192,8 @@ const QuoteList = () => {
           <IndexTable.Cell>
             {status === "Order Placed"
               ?
-              <span>
-                <Button onClick={() => handleGo(quote_order_id)}>See Order Details</Button>
+              <span className={`${planId === 1 && 'disabledButton'}`}>
+                <Button onClick={() => handleGo(quote_order_id)} disabled={planId === 1 && true}>See Order Details</Button>
               </span>
               :
               <>
@@ -201,10 +204,11 @@ const QuoteList = () => {
                 </span>
 
                 {smallLoading && indexLoading === index ? <span className={`${smallLoading && 'indexLoading'}`}><SmallSpinner /></span> :
-                  <span>
-                    <Button onClick={() => convertHandler(quote_id, index)}>
+                  <span className={`${planId === 1 && 'disabledButton'}`}>
+                    <Button onClick={() => convertHandler(quote_id, index)} disabled={planId === 1 && true}>
                       Convert to Quote
                     </Button>
+
                   </span>
                 }
 
@@ -310,7 +314,13 @@ const QuoteList = () => {
                   </span>
                 </div>
               </div>
-              
+
+              {planId === 1 &&
+                <div className='note'>
+                  Note:- You do not have subscribed any plan yet, please upgrade your plan, so that you can enjoy some more functions.
+                </div>
+              }
+
 
               <div style={{ marginTop: '60px' }}>
                 <LegacyCard>

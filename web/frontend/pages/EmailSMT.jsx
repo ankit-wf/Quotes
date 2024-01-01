@@ -24,7 +24,7 @@ const EmailSMT = () => {
         setSmallLoading(true)
         let userData = {
             driver: data.Driver,
-            from_email: data.From_Email,
+            // from_email: data.From_Email,
             password: data.Password,
             port: data.Port,
             smtp_server: data.SMTP_Server,
@@ -99,7 +99,7 @@ const EmailSMT = () => {
                 </div>
             </div>
 
-            <div className='email_main_Div'>
+            {/* <div className='email_main_Div'>
                 <div className='label_div'>
                     <label>From Email</label>
                     <div>
@@ -107,7 +107,7 @@ const EmailSMT = () => {
                         {errors.From_Email && <p className='errorPera'>This field is required*</p>}
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             <div className='submitButton smtpSubmit'>
                 {smallLoading ? <SmallSpinner /> : <input className='smtpButton' type="submit" value='Save Data' />}

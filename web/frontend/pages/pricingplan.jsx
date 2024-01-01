@@ -24,6 +24,7 @@ const PricingPlan = () => {
   const [activeSub, setActiveSub] = useState("");
   const [metaId, setMetaId] = useState("");
   const [commonForm, setCommonForm] = useState();
+  const swtAltMsg = { title: "Successfully Updated", text: "Your data has been updadted successfully", isSwtAlt: false, smallSpinner: "" };
 
   useEffect(async () => {
     const shopApi = await customHooks.shop();
@@ -51,11 +52,26 @@ const PricingPlan = () => {
   const handleChange = async (value) => {
     setPlanValue(value.plan)
     setSmallLoading(true)
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const day = String(currentDate.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+
+    const customerData = {
+      key: "pricing-plan-data",
+      namespace: "quotes-app",
+      ownerId: `${metaId}`,
+      type: "single_line_text_field",
+      value: JSON.stringify({ shop: shop.shopName, plan: value.plan, planId: value.id, startDate: formattedDate })
+    };
+
     if (value.id === 1) {
       try {
         const response = await fetch(`/api/subscription/cancel?id=${activeSub}`);
         const result = await response.json();
         if (result.msg === "Subscription Cancelled") {
+          await customHooks.createAppMetafield(customerData, swtAltMsg);
           setSmallLoading(false)
           navigate('/');
         }
@@ -71,7 +87,7 @@ const PricingPlan = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ price: value.amount, shop: shop.shopName, plan: value.plan, returnUrl: returnData }),
+          body: JSON.stringify({ price: value.amount, shop: shop.shopName, plan: value.plan, returnUrl: returnData, trial: 1 }),
         });
         const result = await response.json();
         const urlName = result.data.confirmation_url
@@ -79,6 +95,7 @@ const PricingPlan = () => {
         const data = defaultMetafieldSetup(metaId);
         createAppDataMetafields(data[0]);
         editForm();
+        await customHooks.createAppMetafield(customerData, swtAltMsg);
         subscription.ReloadPage();
         setSmallLoading(false)
       } catch (error) {
