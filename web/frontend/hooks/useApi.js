@@ -68,19 +68,30 @@ const useApi = () => {
                 }
             })
             let newArrId = "";
+            let newPlanCreatedDate = "";
+            console.log("newlist", newArr)
             await newArr.find((value) => {
                 if (value.status.toLowerCase() === "active") {
                     newArrId = value.id
+                    newPlanCreatedDate = value.activated_on
                 }
             })
+            const currentDate = new Date();
+            const year = currentDate.getFullYear();
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+            const day = String(currentDate.getDate()).padStart(2, '0');
+            const formattedDate = `${year}-${month}-${day}`;
+            
             let id = newArrId;
-            return { id: id, currentPlan: currentPlan, planId: planId }
+            let createDate = newPlanCreatedDate ? newPlanCreatedDate : formattedDate;
+            return { id: id, currentPlan: currentPlan, planId: planId, createDate: createDate }
         } catch (error) {
             console.error("Error:", error);
         }
     };
 
     const createAppMetafield = async (data, msg) => {
+        console.log("bbbbbbbbbbbbbbb", data)
         try {
             const response = await fetch("/api/app-metafield/create", {
                 method: "POST",
@@ -110,51 +121,49 @@ const useApi = () => {
     const commonForm = () => {
         let defaultForm = [
             {
-              className: "form-control",
-              label: "Name",
-              subtype: "text",
-              placeholder: "",
-              name: "name",
-              type: "text",
+                className: "form-control",
+                label: "Name",
+                subtype: "text",
+                placeholder: "",
+                name: "name",
+                type: "text",
             },
             {
-              className: "form-control",
-              label: "Email",
-              subtype: "email",
-              placeholder: "",
-              name: "email",
-              type: "text",
+                className: "form-control",
+                label: "Email",
+                subtype: "email",
+                placeholder: "",
+                name: "email",
+                type: "text",
             },
             {
-              type: "text",
-              subtype: "tel",
-              label: "Mobile",
-              className: "form-control",
-              name: "text",
-              access: false
+                type: "text",
+                subtype: "tel",
+                label: "Mobile",
+                className: "form-control",
+                name: "text",
+                access: false
             },
             {
-              type: "textarea",
-              required: false,
-              label: "Message",
-              placeholder: "",
-              className: "form-control",
-              name: "textarea",
-              access: false,
-              subtype: "textarea",
+                type: "textarea",
+                required: false,
+                label: "Message",
+                placeholder: "",
+                className: "form-control",
+                name: "textarea",
+                access: false,
+                subtype: "textarea",
             },
             {
-              type: "button",
-              subtype: "submit",
-              label: "Submit",
-              className: "btn-primary btn",
-              name: "button",
-              access: false,
-              style: "primary",
+                type: "button",
+                subtype: "submit",
+                label: "Submit",
+                className: "btn-primary btn",
+                name: "button",
+                access: false,
+                style: "primary",
             },
-          ]
-
-        // let defaultForm = [{ "type": "text", "label": "Name", "className": "form-control", "name": "name", "access": false, "subtype": "text" }, { "type": "text", "subtype": "email", "label": "Email", "className": "form-control", "name": "email", "access": false }, { "type": "text", "subtype": "tel", "label": "Phone", "className": "form-control", "name": "text", "access": false }, { "type": "textarea", "label": "Message", "className": "form-control", "name": "textarea", "access": false, "subtype": "textarea" }, { "type": "button", "subtype": "submit", "label": "Submit", "className": "btn-primary btn", "name": "button", "access": false, "style": "primary" }]
+        ]
 
         let htmlForm = `<div class="rendered-form"><div class="formbuilder-text form-group field-name"><label for="name" class="formbuilder-text-label">Name</label><input type="text" class="form-control" name="name" id="name"></div><div class="formbuilder-text form-group field-email"><label for="email" class="formbuilder-text-label">Email</label><input type="email" class="form-control" name="email" id="email"></div><div class="formbuilder-text form-group field-text"><label for="phone" class="formbuilder-text-label">Phone</label><input type="tel" class="form-control" name="phone" id="phone"></div><div class="formbuilder-textarea form-group field-textarea"><label for="message" class="formbuilder-textarea-label">Message</label><textarea class="form-control" name="message" id="message"></textarea></div><div class="formbuilder-button form-group field-button"><button type="submit" class="btn-primary btn" name="button" style="primary" id="button">Submit</button></div></div>`
 

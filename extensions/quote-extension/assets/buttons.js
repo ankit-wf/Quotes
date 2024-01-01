@@ -15,7 +15,7 @@ let variant_img = ""
 let getvariants = JSON.parse(localStorage.getItem("variants")) === null ? "" : JSON.parse(localStorage.getItem("variants"))
 let shopdetail = JSON.parse(localStorage.getItem("shop")) === null ? "" : JSON.parse(localStorage.getItem("shop"))
 let arrr = {}
-let adminMetaresult = []
+let adminMetaresult;
 let metfieldToken = []
 let customerMetaresult = []
 let fieldForms;
@@ -28,8 +28,10 @@ let gridSettings
 let subscription
 let clickData = { isView: 0, isClick: 1 };
 let viewData = { isView: 1, isClick: 0 };
+let emailQuota;
+let totalQuote;
+let finalEmailQuote;
 
-console.log("fffffffff", productAllData)
 
 
 conversionFunc(BACKEND_PORT, productAllData, shopdetail, viewData)
@@ -43,8 +45,11 @@ async function GetQuotes(FinalData) {
     metafiledLabel = JSON.parse(FinalData.getAttribute("metafiledLabel"));
     gridSettings = JSON.parse(FinalData.getAttribute("gridSettings"));
     fieldForms = FinalData.getAttribute("metafieldForm");
-    subscription = FinalData.getAttribute("subscription");
+    subscription = JSON.parse(FinalData.getAttribute("subscription"));
     let variantArr = [FetchData]
+
+    console.log("adminMetaresult", subscription)
+
     variantArr.map((val) => {
         val.variants.map((data) => {
             if (data.id === parseInt(urlNew)) {
@@ -87,6 +92,7 @@ document.addEventListener('keyup', function (e) {
 
 
 async function Modal() {
+    console.log("fffffffffffffffffffff", subscription)
     var getVariantSize
     modal.style.display = "block";
     EmailSuccess.style.display = 'none';
@@ -548,9 +554,9 @@ async function Modal() {
             ];
 
             combineArr = tokens.concat(idVar);
-            let abc = subscription.replace(/"/g, "");
+            // let abc = subscription.plan.replace(/"/g, "");
 
-            if (abc === "Premium") {
+            if (subscription.planId === 3) {
                 let New_Data = new FormData();
                 const fileInput = document.getElementById(idValue);
 
@@ -586,6 +592,8 @@ async function Modal() {
                 }
             )
         });
+        console.log("adminMetaresult.subject", adminMetaresult)
+
         function replaceTokens(str) {
             for (let i = 0; i < combineArr.length; i++) {
                 for (let k = 0; k < metfieldToken.length; k++) {
@@ -609,8 +617,12 @@ async function Modal() {
             shop_email: adminMetaresult.adminEmail,
             shop_name: shopdetail[0].shop_name,
             subject: subject,
+            companyName: adminMetaresult.companyName,
             admin_email: shopdetail[0].shop_email
         }
+        console.log("ggeett", getData)
+
+
         var inputs = document.querySelectorAll('.rendered-form input');
         var All_labels = document.querySelectorAll(".formbuilder-text-label");
         let EmptyCheck = false;
@@ -643,8 +655,9 @@ async function Modal() {
             var formattedPrice = (FetchData.price / 100).toFixed(2)
             var totalAmount = formattedPrice * quantityValue;
             let detailArr_data = [{ id: FetchData.id, image: variant_img, title: FetchData.title, variants: JSON.stringify(arrr), variantId: variantId, quantity: quantityValue, price: formattedPrice, handle: FetchData.handle },
-            { id: 2, image: 'https://mukesh-kumar004.myshopify.com/cdn/shop/products/bedroom-bed-with-brown-throw-pillows_925x_76c8c3a0-831b-47ac-a33a-5efdeb6cdee7.jpg?v=1685594875', title: "Black Beanbag", variants: JSON.stringify(arrr), variantId: 45499843838236, quantity: "50", price: "10", handle:"black-beanbag" }]
+            { id: 2, image: 'https://mukesh-kumar004.myshopify.com/cdn/shop/products/bedroom-bed-with-brown-throw-pillows_925x_76c8c3a0-831b-47ac-a33a-5efdeb6cdee7.jpg?v=1685594875', title: "Black Beanbag", variants: JSON.stringify(arrr), variantId: 45499843838236, quantity: "50", price: "10", handle: "black-beanbag" }]
 
+            await getAutoEmailFunc()
 
             try {
                 const response = await fetch(`${BACKEND_PORT}/quote/createquote`, {
@@ -653,7 +666,7 @@ async function Modal() {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        userArr: JSON.stringify(getValue), shop: getData, detailArr_data: detailArr_data
+                        userArr: JSON.stringify(getValue), shop: getData, detailArr_data: detailArr_data, finalEmailQuote: finalEmailQuote, emailQuota: emailQuota, totalQuote: 101
                     }),
                 })
 
@@ -673,12 +686,63 @@ async function Modal() {
                     document.getElementById(idValue).value = ""
                     ModalForm.style.display = 'none';
                     EmailSuccess.style.display = 'block';
-                    updateConversionFunc();
+                    await updateConversionFunc();
+                    if (totalQuote <= emailQuota) {
+                        await getAutoEmailFunc();
+                        await senAutoEmail(getValue, getData, finalEmailQuote, emailQuota, totalQuote);
+                    }
                 }
             } catch (error) {
                 console.error("Error:", error);
             }
         }
+    }
+}
+
+async function getAutoEmailFunc() {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const day = String(currentDate.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+
+    try {
+        const response = await fetch(`${BACKEND_PORT}/api/plan/emailQuota?planName=${JSON.stringify(subscription.plan)}`);
+        const result = await response.json();
+        console.log("rrrrrrrr", result)
+        emailQuota = result.result[0].email_quota
+        console.log("email", emailQuota)
+    } catch (error) {
+        console.error("Error:", error);
+    }
+
+    try {
+        const response = await fetch(`${BACKEND_PORT}/api/remainingQuote?shop=${JSON.stringify(subscription.shop)}&&startDate=${subscription.startDate}&&lastDate=${formattedDate}`);
+        const result = await response.json();
+        console.log("gggghhhhhhh", result)
+        totalQuote = result.result
+        console.log("total", totalQuote)
+    } catch (error) {
+        console.error("Error:", error);
+    }
+
+    finalEmailQuote = totalQuote / emailQuota * 100;
+    console.log("r", finalEmailQuote)
+}
+
+async function senAutoEmail(getValue, getData, finalEmailQuote, emailQuota, totalQuote) {
+    try {
+        const response = await fetch(`${BACKEND_PORT}/sendAutoEmail`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                userArr: JSON.stringify(getValue), shop: getData, finalEmailQuote: finalEmailQuote, emailQuota: emailQuota, totalQuote: totalQuote
+            }),
+        })
+    } catch (err) {
+        console.log(err)
     }
 }
 
@@ -701,6 +765,7 @@ async function updateConversionFunc() {
     } catch (error) {
         console.error(`Download error: ${error}`);
     }
+
 }
 
 window.onclick = function (event) {

@@ -22,6 +22,7 @@ const AdminForm = () => {
     const [shopData, setShopData] = useState("");
     const [loading, setLoading] = useState(true)
     const [smallLoading, setSmallLoading] = useState(false);
+    const [smallLoadingNext, setSmallLoadingNext] = useState(false);
     const swtAltMsg = { title: "Successfully Updated", text: "Your data has been updadted successfully", isSwtAlt: true, smallSpinner: setSmallLoading };
 
     useEffect(async () => {
@@ -50,6 +51,8 @@ const AdminForm = () => {
     }, [])
 
     const onSubmit = async (data) => {
+        console.log("data", data)
+        setSmallLoading(true)
         const customerData = {
             key: "admin-form-display",
             namespace: "quotes-app",
@@ -58,10 +61,11 @@ const AdminForm = () => {
             value: JSON.stringify(data)
         };
         await metafieldHook.createAppMetafield(customerData, swtAltMsg);
+        setSmallLoading(false)
     }
 
     const onSubmitEmail = async (data) => {
-        setSmallLoading(true)
+        setSmallLoadingNext(true)
         let name = "John"
         let number = "985241325"
         let msg = "Query about this Product. It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English."
@@ -88,6 +92,7 @@ const AdminForm = () => {
             reset2({ testemail: "" })
             await response.json();
             metafieldHook.swtAlt(swtAltMsg);
+            setSmallLoadingNext(false);
         } catch (error) {
             console.error("Error:", error);
         }
@@ -119,7 +124,7 @@ const AdminForm = () => {
                                 {errors1.subject && <p className='errorPera'>{errorConstant.EmptyFieldError}</p>}
 
                                 <Controller
-                                    name="dataEmail"
+                                    name="adminEmail"
                                     control={control1}
                                     defaultValue={""}
                                     rules={{ required: true, pattern: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/ }}
@@ -179,6 +184,21 @@ const AdminForm = () => {
                                 />
                                 {errors1.emailFrom && errors1.emailFrom.type === "required" && <p className='errorPera'>{errorConstant.EmptyFieldError}</p>}
                                 {errors1.emailFrom && errors1.emailFrom.type === "pattern" && <p className='errorPera'>{errorConstant.EmailFieldError}</p>}
+
+                                <Controller
+                                    name="companyName"
+                                    control={control1}
+                                    rules={{ required: true }}
+                                    defaultValue={""}
+                                    render={({ field }) => <TextField type="text" onChange={field.onChange}
+                                        onBlur={field.onBlur}
+                                        value={field.value}
+                                        name={field.name}
+                                        inputRef={field.ref}
+                                        label="Comapny Name" />}
+                                />
+                               {errors1.comapnyName && <p className='errorPera'>{errorConstant.EmptyFieldError}</p>}
+
                                 <div className='submitButton'>
                                     {smallLoading ? <SmallSpinner /> : <input type="submit" />}
                                 </div>
@@ -217,7 +237,7 @@ const AdminForm = () => {
                                     {errors2.testemail && errors2.testemail.type === "required" && <p className='errorPera'>{errorConstant.EmptyFieldError}</p>}
                                     {errors2.testemail && errors2.testemail.type === "pattern" && <p className='errorPera'>{errorConstant.EmailFieldError}</p>}
                                     <div className='submitButton'>
-                                        {smallLoading ? <SmallSpinner /> : <input type="submit" />}
+                                        {smallLoadingNext ? <SmallSpinner /> : <input type="submit" />}
                                     </div>
                                 </form>
                             </AlphaCard>

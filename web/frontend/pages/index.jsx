@@ -16,7 +16,6 @@ import usePagination from '../hooks/usePagination';
 import ProSubscription from './ProSubscription';
 import "./css/myStyle.css";
 import useApi from '../hooks/useApi';
-import useDateFormat from '../hooks/useDateFormat';
 
 export default function HomePage() {
   const { search } = useLocation();
@@ -37,19 +36,12 @@ export default function HomePage() {
   const [emailQuota, setEmailQuota] = useState("");
   const [data, setData] = useState([]);
   const [remainData, setRemainData] = useState([]);
-  const changeDate = useDateFormat();
-  var date = new Date();
-  var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-  var lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-  const finalFirstDay = changeDate.convertFormat(firstDay);
-  const finalLastDay = changeDate.convertFormat(lastDay);
   const paginationFunc = pagination.pagination(totalRecord, listingPerPage);
   let firstPost = paginationFunc.firstPost;
   const [selected, setSelected] = useState('today');
   const [totalChart, setTotalChart] = useState("today");
   const [chartOne, setChartOne] = useState([]);
   const [isFirstButtonActive, setIsFirstButtonActive] = useState(true);
-  const swtAltMsg = { title: "Successfully Updated", text: "Your data has been updadted successfully", isSwtAlt: false };
   const options = [
     { label: 'Today', value: 'today' },
     { label: 'Yesterday', value: 'yesterday' },
@@ -61,15 +53,21 @@ export default function HomePage() {
   let newPlan = 1;
   let toolData = emailQuota - remainData;
   const [planStatus, setPlanstatus] = useState("");
+  const currentDate = new Date();
+
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  const day = String(currentDate.getDate()).padStart(2, '0');
+  const formattedDate = `${year}-${month}-${day}`;
 
 
   useEffect(async () => {
+    console.log("i am here")
     const shopApi = await ShopApi.shop();
     const planId = await metafieldHook.getCurrentPlan();
     setPlanstatus(planId.currentPlan);
     setStatus(planId.planId);
     setShop(shopApi);
-    const metafieldId = await metafieldHook.metafield();
 
     try {
       const response = await fetch(`/api/folderSize`);
@@ -131,23 +129,12 @@ export default function HomePage() {
     }
 
     try {
-      const response = await fetch(`/api/remainingQuote?shop=${JSON.stringify(shopApi.shopName)}&&startDate=${finalFirstDay}&&lastDate=${finalLastDay}`);
+      const response = await fetch(`/api/remainingQuote?shop=${JSON.stringify(shopApi.shopName)}&&startDate=${planId.createDate}&&lastDate=${formattedDate}`);
       const result = await response.json();
-      console.log("hhhhhhhhhh", result)
       setRemainData(result.result)
     } catch (error) {
       console.error("Error:", error);
     }
-
-    const metafieldData = {
-      key: "subscription",
-      namespace: "quotes-app",
-      ownerId: `${metafieldId}`,
-      type: "single_line_text_field",
-      value: JSON.stringify(planId.currentPlan)
-    };
-
-    await metafieldHook.createAppMetafield(metafieldData, swtAltMsg);
     setLoader(false)
   }, [totalChart, currentPage, newPlan])
 
@@ -281,7 +268,7 @@ export default function HomePage() {
     const db = JSON.parse(data)
     entries = Object.entries(db)
   }
-  console.log("ssssssssssss", data)
+
   const rowMarkup = data.map(
     (
       { product_stats_id, product_name, views, clicks, conversions }
@@ -305,7 +292,7 @@ export default function HomePage() {
     ),
   );
 
-  console.log("fffffffffffffffff", remainData, rowMarkup.length)
+
   return (
     <>
       {loader ?
@@ -455,7 +442,7 @@ export default function HomePage() {
 
                       {status === 1 && (
                         <>
-                          {remainData - rowMarkup.length > 0 &&
+                          {totalRecord - rowMarkup.length > 0 &&
                             <div className='freeSkeltonDiv'>
                               <LegacyCard sectioned>
                                 <TextContainer>
@@ -469,7 +456,7 @@ export default function HomePage() {
                               </LegacyCard>
 
                               <div className='freeSeeMore'>
-                                <p>To See All Remaining Records ({totalRecord})</p>
+                                <p>To See All Remaining Records</p>
                                 <ProSubscription />
                               </div>
                             </div>
@@ -479,7 +466,7 @@ export default function HomePage() {
 
                       {status === 2 &&
                         <>
-                          {remainData < 100
+                          {totalRecord < 100
                             ?
                             <PaginationControl
                               page={parseInt(pagination.currentPage)}
@@ -502,7 +489,7 @@ export default function HomePage() {
                                 </TextContainer>
                               </LegacyCard>
                               <div className='freeSeeMore'>
-                                <p>Your Limit reached to 100, Please Upgrade to Premium to Add More ({remainData})</p>
+                                <p>Please Upgrade to Premium plan to see more records</p>
                                 <ProSubscription />
                               </div>
                             </div>
@@ -510,7 +497,7 @@ export default function HomePage() {
                         </>
                       }
 
-                      
+
                       {status === 3 && (
                         <>
                           <PaginationControl
@@ -534,4 +521,4 @@ export default function HomePage() {
       }
     </>
   );
-} true
+} 

@@ -24,7 +24,7 @@ const ProSubscription = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ price: value.amount, shop: shop.shopName, plan: value.plan, returnUrl: returnData }),
+        body: JSON.stringify({ price: value.amount, shop: shop.shopName, plan: value.plan, returnUrl: returnData}),
       });
       const result = await response.json();
       const urlName = result.data.confirmation_url
